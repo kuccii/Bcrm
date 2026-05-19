@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — Kigali Business Directory</title>
+<script src="crm-data.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:#f4f6fb;color:#1a1a2e;display:flex;height:100vh;overflow:hidden}
+.side{width:195px;background:#1a1a2e;border-right:1px solid #e0e4ed;display:flex;flex-direction:column;flex-shrink:0;z-index:10}
+.side-h{padding:18px 16px 12px;border-bottom:1px solid #2a2a4e}
+.side-h h1{font-size:18px;color:#fff}
+.side-h span{font-size:11px;color:#8b85ff}
+.nav{flex:1;overflow-y:auto;padding:6px 0}
+.nv{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:13px;color:#8888aa;transition:.12s;border-left:3px solid transparent}
+.nv:hover{background:#222248;color:#ccccee}
+.nv.on{background:#222248;color:#fff;border-color:#6c63ff}
+.nv .ic{width:20px;text-align:center;font-size:16px}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#f4f6fb}
+.top{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid #e0e4ed;background:#fff;flex-wrap:wrap}
+.top input{flex:1;min-width:160px;max-width:320px;padding:9px 14px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:8px;color:#1a1a2e;font-size:14px;outline:none}
+.top input:focus{border-color:#6c63ff;box-shadow:0 0 0 3px rgba(108,99,255,.12)}.top input::placeholder{color:#aaa}
+.top select{padding:8px 12px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:8px;color:#444;font-size:13px;outline:none;max-width:160px}
+.top .inf{font-size:13px;color:#8888aa;white-space:nowrap}
+.tbar{display:flex;gap:6px;align-items:center}
+.tbar button{padding:7px 14px;border-radius:8px;border:1px solid #dde1ec;background:#fff;color:#8888aa;font-size:13px;cursor:pointer;transition:.12s;white-space:nowrap}
+.tbar button:hover{border-color:#6c63ff;color:#6c63ff;background:#f8f7ff}
+.cx{flex:1;overflow:auto;padding:18px 22px}
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.sc{background:#fff;border:1px solid #e0e4ed;border-radius:10px;padding:14px 16px;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sc:hover{border-color:#6c63ff;box-shadow:0 3px 12px rgba(108,99,255,.1);transform:translateY(-1px)}
+.sc .n{font-size:24px;font-weight:700;color:#1a1a2e;line-height:1.2}
+.sc .l{font-size:12px;color:#8888aa;margin-top:3px;font-weight:500}
+.sc .n.r{color:#e53935}.sc .n.g{color:#43a047}.sc .n.b{color:#6c63ff}.sc .n.o{color:#fb8c00}
+.fb{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.fb button{padding:6px 16px;border-radius:20px;border:1px solid #dde1ec;background:#fff;color:#666;font-size:13px;cursor:pointer;transition:.12s;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.fb button:hover{border-color:#c0c4d0;color:#444;background:#fafbfd}
+.fb button.on{background:#6c63ff;border-color:#6c63ff;color:#1a1a2e;box-shadow:0 2px 8px rgba(108,99,255,.25)}
+.fb button .c{background:#edf0f8;padding:1px 8px;border-radius:10px;font-size:11px;margin-left:5px;color:#8888aa}
+.fb button.on .c{background:rgba(255,255,255,.2);color:#1a1a2e}
+.bbar{display:none;padding:10px 16px;background:#f0eeff;border:1px solid #6c63ff;border-radius:10px;margin-bottom:10px;align-items:center;gap:12px;font-size:13px;color:#1a1a2e}
+.bbar.on{display:flex}
+.bbar select{padding:5px 10px;background:#fff;border:1px solid #dde1ec;border-radius:6px;color:#444;font-size:13px;outline:none}
+.bbar button{padding:6px 16px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:500;background:#6c63ff;color:#1a1a2e}
+.bbar button:hover{background:#5b52e8}
+.tb{background:#fff;border:1px solid #e0e4ed;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+table{width:100%;border-collapse:collapse}
+th{background:#f8f9fd;padding:9px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;color:#8888aa;cursor:pointer;border-bottom:2px solid #e8ebf2;white-space:nowrap;user-select:none;letter-spacing:.4px}
+th:hover{color:#6c63ff}
+th .ar{margin-left:4px;font-size:10px;color:#6c63ff}
+td{padding:8px 12px;font-size:13px;border-bottom:1px solid #eef0f6;color:#444;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8f9fd}
+tr.c{cursor:pointer}
+tr.sel td{background:#f0eeff}
+.st{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600;letter-spacing:.2px}
+.st.wk{background:#e8f5e9;color:#2e7d32}
+.st.br{background:#fff3e0;color:#e65100}
+.st.nn{background:#ffebee;color:#c62828}
+.sts{padding:5px 10px;background:#fff;border:1px solid #dde1ec;border-radius:6px;color:#444;font-size:13px;cursor:pointer;outline:none}
+.pg{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:13px;color:#8888aa}
+.pg .pb{display:flex;gap:4px}
+.pg .pb button{min-width:32px;height:32px;border:1px solid #dde1ec;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;color:#666;transition:.1s}
+.pg .pb button:hover{border-color:#6c63ff;color:#6c63ff;background:#f8f7ff}
+.pg .pb button.on{background:#6c63ff;color:#fff;border-color:#6c63ff}
+.pg .pb button:disabled{opacity:.3;cursor:default}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.mo.on{display:flex}
+.m{background:#fff;border:1px solid #e0e4ed;border-radius:14px;width:560px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 25px 80px rgba(0,0,0,.15);animation:up .2s}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.mh{padding:16px 22px 12px;border-bottom:1px solid #eef0f6;display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:#fff;z-index:2}
+.mh h2{font-size:17px;color:#1a1a2e}.mh .x{background:none;border:none;font-size:22px;color:#aaa;cursor:pointer;padding:0 4px;line-height:1}.mh .x:hover{color:#333}
+.mb{padding:14px 22px}
+.mb .rw{display:flex;padding:7px 0;border-bottom:1px solid #eef0f6;align-items:flex-start}
+.mb .rw:last-child{border:none}
+.mb .lbl{width:90px;font-size:11px;font-weight:600;color:#8888aa;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;padding-top:2px}
+.mb .val{font-size:14px;color:#333;word-break:break-word}
+.mb .val a{color:#6c63ff;text-decoration:none}
+.mb .val a:hover{text-decoration:underline}
+.mf{padding:12px 22px;border-top:1px solid #eef0f6;display:flex;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff}
+.mf button{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:.12s}
+.mc{background:#43a047;color:#1a1a2e;font-weight:600}.mc:hover{background:#388e3c}
+.me{background:#6c63ff;color:#1a1a2e;font-weight:600}.me:hover{background:#5b52e8}
+.mw{background:#fff;color:#666;border:1px solid #dde1ec!important;font-weight:500}.mw:hover{background:#f5f5f5;border-color:#c0c4d0!important}
+.ms{background:#fb8c00;color:#1a1a2e;font-weight:600}.ms:hover{background:#f57c00}
+.mb textarea{width:100%;margin-top:6px;padding:8px 12px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:8px;color:#333;font-size:13px;resize:vertical;min-height:50px;outline:none;font-family:inherit}
+.mb textarea:focus{border-color:#6c63ff;box-shadow:0 0 0 3px rgba(108,99,255,.08)}
+.mb .svc{display:inline-block;padding:3px 10px;border-radius:6px;background:#f0eeff;color:#6c63ff;font-size:12px;margin:2px;font-weight:500}
+#toast{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#1a1a2e;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .25s;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none}
+#toast.show{opacity:1}
+.side .ftr{font-size:12px;color:#6666aa;text-align:center}
+.side .ftr div{cursor:pointer;color:#6c63ff;margin-bottom:5px}
+.side .ftr div:hover{color:#8b85ff}
+.bar{height:22px;background:#eef0f6;border-radius:6px;overflow:hidden;position:relative}
+.bar .fill{height:100%;border-radius:6px;transition:width .4s}
+.bar .fill.g{background:#43a047}.bar .fill.b{background:#6c63ff}.bar .fill.o{background:#fb8c00}.bar .fill.r{background:#e53935}
+.bar .lbl{position:absolute;left:10px;top:0;font-size:12px;color:#1a1a2e;line-height:22px;white-space:nowrap;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d0d4e0;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#b0b8c8}
+@media(max-width:768px){.side{display:none}.top{flex-direction:column;align-items:stretch}.top input{max-width:none}.cx{padding:12px}}
+</style>
+</head>
+<body>
+
+<div class="side">
+  <div class="side-h"><h1>CRM</h1><span>2,750 Kigali Businesses</span>
+  <div style="margin-top:8px;padding:6px 10px;background:#222248;border-radius:6px;font-size:11px;color:#ccccee;line-height:1.4">
+    <strong style="color:#fff">How to use:</strong><br>
+    1. Pick a list below<br>
+    2. Click a lead to see details<br>
+    3. Call + log outcome
+  </div>
+</div>
+  <div class="nav" id="nav"></div>
+    <div class="ftr" style="padding:10px 16px;border-top:1px solid #2a2a4e">
+    <div onclick="syncToAgent()" style="font-weight:600;font-size:12px;color:#8b85ff;margin-bottom:5px;cursor:pointer">&#128279; Sync to Call Agent</div>
+    <div onclick="backup()" style="cursor:pointer;color:#8b85ff;margin-bottom:4px;font-size:11px">&#128190; Backup Data</div>
+    <div onclick="document.getElementById('restoreInput').click()" style="cursor:pointer;color:#8b85ff;margin-bottom:0;font-size:11px">&#128194; Restore Data</div>
+    <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restore(event)">
+  </div>
+</div>
+
+<div class="main">
+  <div class="top">
+    <input type="text" id="q" placeholder="Search name, category, email, phone, address..." oninput="doSearch()">
+    <select id="catSel" onchange="doSearch()"><option value="">All Categories</option></select>
+    <select id="pp" onchange="doSearch()"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option></select>
+    <span class="inf" id="info"></span>
+    <div class="tbar">
+      <button onclick="exportCSV()" title="Export filtered results as CSV">&#128229; CSV</button>
+      <button onclick="clearFilters()" title="Clear all filters">&#10005; Clear</button>
+    </div>
+  </div>
+  <div class="cx" id="cx"></div>
+</div>
+
+<div class="mo" id="mo" onclick="if(event.target===this)closeM()">
+  <div class="m">
+    <div class="mh"><h2 id="mt"></h2><button class="x" onclick="closeM()">&#10005;</button></div>
+    <div class="mb" id="mb"></div>
+    <div class="mf" id="mf"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+const ST = ['New','Called','Contacted','Interested','Not Interested','Follow Up','Closed Won','Closed Lost'];
+let tab = 'prospect', sc = 'id', sd = 1, pg = 0, pp = 50, sq = '', sf = '', lk = 'hot-leads', ck = '', sk = '';
+let sv = JSON.parse(localStorage.getItem('crm') || '{}');
+let sel = new Set();
+
+// ─── Helper: HTML-escape a string for use in onclick or text ───
+function esc(v) { return (v || '').toString().replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+// ─── Helper: encode for localStorage key (remove special chars) ───
+function key(v) { return v.replace(/[&\/\\'",.<>]/g,'').replace(/\s+/g,'_'); }
+
+function sl(id, k, v) { if(!sv[id]) sv[id]={}; sv[id][k]=v; sv[id].t=Date.now(); localStorage.setItem('crm',JSON.stringify(sv)); }
+
+// ═══════════════════════════════════════
+// PROSPECT LIST FILTERS
+// ═══════════════════════════════════════
+function listFilter(key) {
+  if (key === 'hot-leads') return x => x.needsWebsite && x.phone.length > 0;
+  if (key === 'restaurants') return x => CRM_FOOD.includes(x.cat) && x.needsWebsite;
+  if (key === 'hotels') return x => CRM_HOTEL.includes(x.cat);
+  if (key === 'retail') return x => CRM_RETAIL.includes(x.cat);
+  if (key === 'medical') return x => CRM_MEDICAL.includes(x.cat);
+  if (key === 'tourism') return x => CRM_TOURISM.includes(x.cat);
+  if (key === 'professionals') return x => CRM_PROF.includes(x.cat);
+  if (key === 'beauty') return x => CRM_BEAUTY.includes(x.cat);
+  if (key === 'automotive') return x => CRM_AUTO.includes(x.cat);
+  if (key === 'no-website') return x => x.needsWebsite;
+  if (key === 'easy-reach') return x => x.needsWebsite && x.email.length > 0 && x.phone.length > 0;
+  return x => true;
+}
+
+function buildNav() {
+  const items = [
+    {i:'🔥',n:'Call Leads',k:'prospect'},{i:'📊',n:'Dashboard',k:'dashboard'},
+    {i:'📋',n:'Directory',k:'all'},{i:'🔧',n:'Services',k:'assess'},
+    {i:'📂',n:'Categories',k:'cats'},{i:'📈',n:'Pipeline',k:'pipe'},
+    {i:'📉',n:'Reports',k:'reports'}
+  ];
+  document.getElementById('nav').innerHTML = items.map(x =>
+    `<div class="nv ${tab===x.k?'on':''}" data-tab="${x.k}"><span class="ic">${x.i}</span>${x.n}</div>`
+  ).join('');
+  // Attach click via data attribute to avoid escaping issues
+  document.querySelectorAll('.nv[data-tab]').forEach(el => {
+    el.onclick = () => goTab(el.dataset.tab);
+  });
+  // Build category dropdown once
+  const catSel = document.getElementById('catSel');
+  if (catSel.options.length <= 1) {
+    CRM_CATS.forEach(([c]) => catSel.innerHTML += `<option value="${esc(c)}">${esc(c)}</option>`);
+  }
+}
+
+function getData() {
+  let d = [...CRM];
+  if (lk) d = d.filter(listFilter(lk));
+  if (ck) d = d.filter(x => x.cat === ck);
+  if (sk) { const q = sk.toLowerCase(); d = d.filter(x => x.services.toLowerCase().includes(q)); }
+  if (sf === 'email') d = d.filter(x => x.email.length > 0);
+  else if (sf) d = d.filter(x => x.ws === sf);
+  if (sq) { const q = sq.toLowerCase(); d = d.filter(x => x.name.toLowerCase().includes(q)||x.cat.toLowerCase().includes(q)||x.email.toLowerCase().includes(q)||x.phone.includes(q)||x.address.toLowerCase().includes(q)); }
+  return d;
+}
+
+// ═══════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════
+function render() {
+  let d = getData(); pp = parseInt(document.getElementById('pp').value);
+  d.sort((a,b) => {
+    if(sc==='id') return (a.id-b.id)*sd;
+    if(sc==='value') return (a.totalValue-b.totalValue)*sd;
+    return ((a[sc]||'').toString().localeCompare((b[sc]||'').toString()))*sd;
+  });
+  const ps = Math.ceil(d.length/pp); if(pg>=ps) pg=Math.max(0,ps-1);
+  const st = pg*pp, en = Math.min(st+pp,d.length), pd = d.slice(st,en);
+  document.getElementById('info').textContent = d.length + ' results';
+  let h = '';
+  if (tab === 'dashboard') h = dashView();
+  else if (tab === 'prospect') h = prospectView(d, pd, st, en, ps);
+  else if (tab === 'assess') h = assessView();
+  else if (tab === 'cats') h = catsView();
+  else if (tab === 'pipe') h = pipeView();
+  else if (tab === 'reports') { document.getElementById('cx').innerHTML = '<div style="text-align:center;padding:30px;color:#8888aa">Loading reports...</div>'; reportsView(); return; }
+  else h = tableView(d, pd, st, en, ps);
+  document.getElementById('cx').innerHTML = h;
+}
+
+// ═══════════════════════════════════════
+// TABLE
+// ═══════════════════════════════════════
+
+function getVP(x) {
+  var svc = x.services.split(', ');
+  var top = svc[0] || 'Website';
+  var second = svc[1] || '';
+  var val = x.totalValue;
+  var cat = x.cat.toLowerCase();
+  if (x.ws === 'none') {
+    if (cat.indexOf('restaurant')>=0||cat.indexOf('cafe')>=0||cat.indexOf('food')>=0) return 'No online menu. Need '+top+' starting $'+val;
+    if (cat.indexOf('hotel')>=0||cat.indexOf('lodge')>=0) return 'No online bookings. Need '+top+' starting $'+val;
+    if (cat.indexOf('shop')>=0||cat.indexOf('retail')>=0||cat.indexOf('fashion')>=0) return 'No online store. Need '+top+' starting $'+val;
+    if (cat.indexOf('clinic')>=0||cat.indexOf('doctor')>=0||cat.indexOf('pharmacy')>=0) return 'No patient system. Need '+top+' starting $'+val;
+    return 'Needs '+top+'. Package $'+val;
+  } else if (x.ws === 'broken') {
+    return 'Website broken. Fix + '+top+'. From $'+val;
+  } else {
+    return 'Add '+top+' to grow. From $'+val;
+  }
+}
+
+function tableView(d, pd, st, en, ps, noFilter) {
+  let h = '';
+  if (!noFilter) {
+    const hc = d.filter(function(x){return x.priority==='high';}).length;
+    const mc = d.filter(function(x){return x.priority==='medium';}).length;
+    const lc = d.filter(function(x){return x.priority==='low';}).length;
+    const ec = d.filter(function(x){return x.email.length>0;}).length;
+    const nc = d.filter(function(x){return x.ws==='none';}).length;
+    h += '<div style="margin-bottom:8px;font-size:12px;color:#8888aa;font-weight:600">Filter by priority:</div>';
+    h += '<div class="fb">';
+    h += '<button class="on" onclick="setSF(\'\')">All <span class="c">' + d.length + '</span></button>';
+    h += '<button onclick="setSF(\'none\')" style="border-color:#e53935;color:#e53935">&#128308; No Website <span class="c">' + nc + '</span></button>';
+    h += '<button onclick="setSF(\'broken\')" style="border-color:#fb8c00;color:#fb8c00">&#128992; Has Issues <span class="c">' + d.filter(function(x){return x.ws==='broken';}).length + '</span></button>';
+    h += '<button onclick="setSF(\'working\')" style="border-color:#43a047;color:#43a047">&#128994; Working <span class="c">' + d.filter(function(x){return x.ws==='working';}).length + '</span></button>';
+    h += '<button onclick="setSF(\'email\')" style="border-color:#6c63ff;color:#6c63ff">&#9993; Has Email <span class="c">' + ec + '</span></button>';
+    h += '</div>';
+  }
+  // Bulk bar
+  h += '<div class="bbar' + (sel.size>0?' on':'') + '" id="bbar">';
+  h += '<span>' + sel.size + ' selected</span>';
+  h += '<select id="bulkSt">' + ST.map(s => '<option value="' + s + '">' + s + '</option>').join('') + '</select>';
+  h += '<button onclick="bulkUpdate()">Update Status</button>';
+  h += '<button onclick="bulkCall()">Call</button>';
+  h += '<button onclick="sel.clear();render()" style="background:transparent;border:1px solid #555;color:#8888aa">Deselect</button>';
+  h += '</div>';
+  // Table
+  h += '<div class="tb"><table><thead><tr>';
+  h += '<th style="width:30px;text-align:center">#</th>';
+  h += '<th onclick="setSC(\'name\')">Business<span class="ar">' + (sc==='name'?(sd===1?'&#9650;':'&#9660;'):'') + '</span></th>';
+  h += '<th>Category</th>';
+  h += '<th style="min-width:200px">What to Pitch</th>';
+  h += '<th>Phone</th>';
+  h += '<th>Status</th>';
+  h += '<th style="width:70px;text-align:center">Call</th>';
+  h += '</tr></thead><tbody>';
+  if (d.length===0) h += '<tr><td colspan="7"><div style="text-align:center;padding:30px;color:#8888aa;font-size:13px">No leads match these filters</div></td></tr>';
+  else pd.forEach(function(x) {
+    var priColor = x.priority === 'high' ? '#e53935' : x.priority === 'medium' ? '#fb8c00' : '#8888aa';
+    h += '<tr class="c" onclick="openM(' + x.id + ')">';
+    h += '<td style="color:#bbb;font-size:12px;text-align:center">' + x.id + '</td>';
+    h += '<td><strong style="color:#1a1a2e">' + esc(x.name) + '</strong></td>';
+    h += '<td style="color:#8888aa">' + esc(x.cat) + '</td>';
+    h += '<td style="color:#6c63ff;font-weight:500;max-width:220px">' + esc(getVP(x)) + '</td>';
+    h += '<td style="font-weight:500">' + (x.phone ? '<span style="color:#1a1a2e">' + esc(x.phone) + '</span>' : '<span style="color:#ccc">\u2014</span>') + '</td>';
+    h += '<td><span class="st ' + x.ws + '">' + (x.ws==='working'?'Working':x.ws==='broken'?'Issues':'No Site') + '</span></td>';
+    h += '<td style="text-align:center"><button onclick="event.stopPropagation();doCall(' + x.id + ')" style="padding:5px 12px;background:#43a047;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">&#9742;</button></td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  if (d.length>0) {
+    const pSt = Math.max(0,pg-2), pEn = Math.min(ps,pSt+5);
+    h += '<div class="pg"><span>' + (st+1) + '-' + en + ' of ' + d.length + '</span><div class="pb">';
+    h += '<button onclick="goP(0)"' + (pg===0?' disabled':'') + '>\u00ab</button>';
+    h += '<button onclick="goP(' + (pg-1) + ')"' + (pg===0?' disabled':'') + '>\u2039</button>';
+    for(let i=pSt;i<pEn;i++) h += '<button class="' + (i===pg?'on':'') + '" onclick="goP(' + i + ')">' + (i+1) + '</button>';
+    h += '<button onclick="goP(' + (pg+1) + ')"' + (pg>=ps-1?' disabled':'') + '>\u203a</button>';
+    h += '<button onclick="goP(' + (ps-1) + ')"' + (pg>=ps-1?' disabled':'') + '>\u00bb</button>';
+    h += '</div></div>';
+  }
+  return h + '</div>';
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function dashView() {
+  const none = CRM.filter(x=>x.ws==='none').length, work = CRM.filter(x=>x.ws==='working').length, broken = CRM.filter(x=>x.ws==='broken').length;
+  const tv = CRM.reduce((s,x)=>s+x.totalValue,0);
+  const won = Object.values(sv).filter(x=>x.status==='Closed Won').length;
+  const called = Object.values(sv).filter(x=>x.status&&x.status!=='New').length;
+  let h = '<div class="sr">';
+  h += '<div class="sc"><div class="n b">' + CRM.length + '</div><div class="l">Total</div></div>';
+  h += '<div class="sc"><div class="n r">' + none + '</div><div class="l">No Website</div></div>';
+  h += '<div class="sc"><div class="n g">' + work + '</div><div class="l">Working</div></div>';
+  h += '<div class="sc"><div class="n o">' + broken + '</div><div class="l">Issues</div></div>';
+  h += '<div class="sc"><div class="n" style="color:#8e24aa">$' + (tv/1000).toFixed(0) + 'K</div><div class="l">Portfolio</div></div>';
+  h += '<div class="sc"><div class="n g">' + won + '</div><div class="l">Won</div></div>';
+  h += '<div class="sc"><div class="n b">' + called + '</div><div class="l">Contacted</div></div>';
+  h += '</div>';
+  h += '<div style="margin-bottom:10px;padding:14px 18px;background:#fff;border:1px solid #e0e4ed;border-radius:10px;display:flex;gap:14px;flex-wrap:wrap;align-items:center">' +
+    '<div style="font-size:13px;color:#1a1a2e;font-weight:600">&#128161; Quick Start:</div>' +
+    '<button onclick="goFirstProspect()" style="padding:8px 18px;background:#6c63ff;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(108,99,255,.3)">&#128293; Hot Leads (' + CRM_LIST_DATA['hot-leads'].count + ')</button>' +
+    '<button onclick="goProspect(\'no-website\')" style="padding:8px 18px;background:#e53935;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">&#128200; All No-Website (' + CRM_LIST_DATA['no-website'].count + ')</button>' +
+    '<button onclick="goProspect(\'easy-reach\')" style="padding:8px 18px;background:#43a047;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">&#128222; Easiest to Reach (' + CRM_LIST_DATA['easy-reach'].count + ')</button>' +
+    '</div>' +
+    '<div style="margin-bottom:5px;font-size:12px;color:#8888aa"><strong style="color:#444">All Prospecting Lists</strong></div><div class="sr">';
+  Object.keys(CRM_LIST_META).forEach(function(k) {
+    const m = CRM_LIST_META[k], ld = CRM_LIST_DATA[k];
+    h += '<div class="sc" data-list="' + k + '"><div class="n" style="font-size:14px;color:#6c63ff">' + m.icon + ' ' + ld.count + '</div><div class="l">' + esc(m.name) + '</div><div style="font-size:10px;color:#8888aa;margin-top:1px">$' + (ld.totalValue/1000).toFixed(0) + 'K</div></div>';
+  });
+  h += '</div>';
+  // Attach click to prospect cards via data attribute
+  setTimeout(function() {
+    document.querySelectorAll('.sc[data-list]').forEach(function(el) {
+      el.onclick = function() { goProspect(el.dataset.list); };
+    });
+  }, 0);
+  // Top categories
+  h += '<div style="margin-top:8px;margin-bottom:3px;font-size:12px;color:#8888aa"><strong style="color:#444">Top Categories</strong></div>';
+  h += '<div class="tb"><table><thead><tr><th>Category</th><th>Total</th><th>No Site</th><th>Value</th><th>Top Service</th></tr></thead><tbody>';
+  CRM_CATS.slice(0,12).forEach(function(cat) {
+    const items = CRM.filter(function(x){return x.cat===cat[0];});
+    const nw = items.filter(function(x){return x.ws==='none';}).length, vl = items.reduce(function(s,x){return s+x.totalValue;},0);
+    const svc = items[0]?.services.split(', ')[0]||'\u2014';
+    h += '<tr class="c" data-cat="' + esc(cat[0]) + '"><td style="color:#1a1a2e;font-size:12px"><strong>' + esc(cat[0]) + '</strong></td><td style="font-size:12px">' + cat[1] + '</td><td style="font-size:12px;color:' + (nw?'#f44336':'#4caf50') + '">' + nw + '</td><td style="color:#43a047;font-weight:600;font-size:12px">$' + vl.toLocaleString() + '</td><td style="color:#8888aa;font-size:11px">' + esc(svc) + '</td></tr>';
+  });
+  h += '</tbody></table></div>';
+  setTimeout(function() {
+    document.querySelectorAll('tr[data-cat]').forEach(function(el) {
+      el.onclick = function() { goTab('cats'); ck = el.dataset.cat; render(); };
+    });
+  }, 0);
+  // Recent activity
+  const rec = Object.entries(sv).filter(function(e){return e[1].t;}).sort(function(a,b){return b[1].t-a[1].t;}).slice(0,6);
+  if(rec.length>0){
+    h += '<div style="margin-top:8px;margin-bottom:3px;font-size:12px;color:#8888aa"><strong style="color:#444">Recent</strong></div>';
+    h += '<div class="tb"><table><thead><tr><th>Business</th><th>Status</th><th>When</th></tr></thead><tbody>';
+    rec.forEach(function(e) {
+      const b = CRM.find(function(x){return x.id==e[0];});
+      if(!b) return;
+      h += '<tr class="c" onclick="openM(' + e[0] + ')"><td style="font-size:12px;color:#1a1a2e"><strong>' + esc(b.name) + '</strong></td><td style="font-size:12px">' + (e[1].status||'New') + '</td><td style="font-size:12px;color:#8888aa">' + new Date(e[1].t).toLocaleDateString() + '</td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  return h;
+}
+
+// ═══════════════════════════════════════
+// PROSPECTING
+// ═══════════════════════════════════════
+function prospectView(d, pd, st, en, ps) {
+  let h = '<div class="sr">';
+  Object.keys(CRM_LIST_META).forEach(function(k) {
+    const m = CRM_LIST_META[k], ld = CRM_LIST_DATA[k];
+    h += '<div class="sc" data-list="' + k + '"><div class="n" style="font-size:13px;color:#6c63ff">' + m.icon + ' ' + ld.count + '</div><div class="l">' + esc(m.name) + '</div><div style="font-size:10px;color:#8888aa;margin-top:1px">$' + (ld.totalValue/1000).toFixed(0) + 'K</div></div>';
+  });
+  h += '</div>';
+  if (lk) {
+    const m = CRM_LIST_META[lk];
+    var pctNoSite = d.length > 0 ? Math.round(d.filter(function(x){return x.ws==='none';}).length / d.length * 100) : 0;
+    h += '<div style="margin-bottom:8px">';
+    h += '<div style="font-size:16px;color:#1a1a2e;font-weight:600">' + m.icon + ' ' + esc(m.name) + '</div>';
+    h += '<div style="font-size:12px;color:#8888aa;margin-top:2px">' + d.length + ' leads \u2022 ' + pctNoSite + '% no website</div>';
+    h += '</div>';
+    h += '<div style="margin-bottom:10px;padding:8px 14px;background:#f0eeff;border:1px solid #d0c8ff;border-radius:8px;display:flex;gap:16px;font-size:12px;color:#555">' +
+      '<span><strong style="color:#6c63ff">1.</strong> Click a lead</span>' +
+      '<span style="color:#d0d0d0">|</span>' +
+      '<span><strong style="color:#6c63ff">2.</strong> Press Call button</span>' +
+      '<span style="color:#d0d0d0">|</span>' +
+      '<span><strong style="color:#6c63ff">3.</strong> Log outcome when done</span>' +
+      '</div>';
+    h += tableView(d, pd, st, en, ps, true);
+    setTimeout(function() {
+      document.querySelectorAll('.sc[data-list]').forEach(function(el) {
+        el.onclick = function() { goProspect(el.dataset.list); };
+      });
+    }, 0);
+  } else {
+    h += '<div style="text-align:center;padding:40px;color:#8888aa;font-size:13px">';
+    h += '<div style="font-size:40px;margin-bottom:10px">&#128073;</div>';
+    h += '<div style="color:#1a1a2e;font-size:16px;font-weight:600;margin-bottom:4px">Choose a list to start calling</div>';
+    h += '<div>Each list targets businesses by opportunity type</div>';
+    h += '</div>';
+    setTimeout(function() {
+      document.querySelectorAll('.sc[data-list]').forEach(function(el) {
+        el.onclick = function() { goProspect(el.dataset.list); };
+      });
+    }, 0);
+  }
+  return h;
+}
+
+// ═══════════════════════════════════════
+// ASSESSMENT  (FIXED with data attributes)
+// ═══════════════════════════════════════
+function assessView() {
+  let h = '<div class="sr">';
+  Object.entries(CRM_SERVICES).slice(0,10).forEach(function(e) {
+    const svc = e[0], price = e[1];
+    const leads = CRM.filter(function(x){return x.services.includes(svc)&&x.ws==='none';});
+    h += '<div class="sc" data-svc="' + esc(svc) + '"><div class="n" style="font-size:11px;color:#43a047">$' + price + '</div><div class="l">' + esc(svc) + '</div><div style="font-size:10px;color:#8888aa;margin-top:1px">' + leads.length + ' leads</div></div>';
+  });
+  h += '</div>';
+  h += '<div style="margin-top:6px;margin-bottom:3px;font-size:12px;color:#8888aa"><strong style="color:#444">Service Market Analysis</strong></div>';
+  h += '<div class="tb"><table><thead><tr><th>Service</th><th>Price</th><th>Leads (No Site)</th><th>Potential Revenue</th><th>Industries</th></tr></thead><tbody>';
+  Object.entries(CRM_SERVICES).forEach(function(e) {
+    const svc = e[0], price = e[1];
+    const leads = CRM.filter(function(x){return x.services.includes(svc)&&x.ws==='none';});
+    const inds = [...new Set(leads.slice(0,15).map(function(x){return x.cat; }))].slice(0,3).join(', ');
+    h += '<tr class="c" data-svc="' + esc(svc) + '">';
+    h += '<td style="color:#1a1a2e;font-size:12px"><strong>' + esc(svc) + '</strong></td>';
+    h += '<td style="color:#43a047;font-weight:600;font-size:12px">$' + price + '</td>';
+    h += '<td style="font-size:12px">' + leads.length + '</td>';
+    h += '<td style="color:#43a047;font-weight:600;font-size:12px">$' + (leads.length*price).toLocaleString() + '</td>';
+    h += '<td style="color:#8888aa;font-size:11px">' + esc(inds||'\u2014') + '</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  // Attach click handlers for service cards and rows
+  setTimeout(function() {
+    document.querySelectorAll('[data-svc]').forEach(function(el) {
+      el.onclick = function() {
+        sk = el.dataset.svc;
+        sq = ''; document.getElementById('q').value = '';
+        goTab('all');
+      };
+    });
+  }, 0);
+  return h;
+}
+
+// ═══════════════════════════════════════
+// CATEGORIES
+// ═══════════════════════════════════════
+function catsView() {
+  let h = '<div class="tb"><table><thead><tr><th>Category</th><th>Total</th><th>No Website</th><th>Working</th><th>Est. Value</th></tr></thead><tbody>';
+  CRM_CATS.forEach(function(cat) {
+    const items = CRM.filter(function(x){return x.cat===cat[0];});
+    const nw = items.filter(function(x){return x.ws==='none';}).length;
+    const wk = items.filter(function(x){return x.ws==='working';}).length;
+    const vl = items.reduce(function(s,x){return s+x.totalValue;},0);
+    h += '<tr class="c" data-cat="' + esc(cat[0]) + '"><td style="color:#1a1a2e;font-size:12px"><strong>' + esc(cat[0]) + '</strong></td><td style="font-size:12px">' + cat[1] + '</td><td style="font-size:12px;color:' + (nw?'#f44336':'#4caf50') + '">' + nw + '</td><td style="font-size:12px">' + wk + '</td><td style="color:#43a047;font-weight:600;font-size:12px">$' + vl.toLocaleString() + '</td></tr>';
+  });
+  h += '</tbody></table></div>';
+  setTimeout(function() {
+    document.querySelectorAll('#cx tr[data-cat]').forEach(function(el) {
+      el.onclick = function() { ck = el.dataset.cat; goTab('all'); };
+    });
+  }, 0);
+  return h;
+}
+
+// ═══════════════════════════════════════
+// PIPELINE
+// ═══════════════════════════════════════
+function pipeView() {
+  let h = '<div class="sr">';
+  ST.forEach(function(s) {
+    const count = Object.values(sv).filter(function(x){return x.status===s;}).length;
+    const base = CRM.filter(function(x){var ld=sv[x.id];return ld?.status===s||(!ld&&s==='New');});
+    const vl = base.reduce(function(sum,x){return sum+x.totalValue;},0);
+    const c = s==='Closed Won'?'#4caf50':s==='New'?'#4a6cf7':s==='Not Interested'||s==='Closed Lost'?'#f44336':'#ff9800';
+    h += '<div class="sc"><div class="n" style="color:' + c + ';font-size:13px">' + (s==='New'?base.length:count) + '</div><div class="l">' + s + '</div><div style="font-size:10px;color:#8888aa;margin-top:1px">$' + (vl/1000).toFixed(0) + 'K</div></div>';
+  });
+  h += '</div>';
+  h += '<div class="tb"><table><thead><tr><th>Business</th><th>Category</th><th>Status</th><th>Value</th></tr></thead><tbody>';
+  CRM.forEach(function(x) {
+    const ld = sv[x.id];
+    if (!ld?.status) return;
+    h += '<tr class="c" onclick="openM(' + x.id + ')"><td style="color:#1a1a2e;font-size:12px"><strong>' + esc(x.name) + '</strong></td><td style="color:#8888aa;font-size:11px">' + esc(x.cat) + '</td><td style="font-size:12px">' + esc(ld.status) + '</td><td style="color:#43a047;font-weight:600;font-size:12px">$' + x.totalValue + '</td></tr>';
+  });
+  return h + '</tbody></table></div>';
+}
+
+// ═══════════════════════════════════════
+// REPORTS (combines agent call data + CRM pipeline)
+// ═══════════════════════════════════════
+function reportsView() {
+  var h = '<div style="margin-bottom:8px;font-size:12px;color:#8888aa;text-align:center">Loading call agent data...</div>';
+  document.getElementById('cx').innerHTML = h;
+
+  // Try to fetch agent call data
+  var agentData = null;
+  var agentLogs = [];
+
+  function finish() {
+    var h = '';
+    var total = CRM.length;
+    var called = Object.keys(sv).length;
+    var won = Object.values(sv).filter(function(x){return x.status==='Closed Won';}).length;
+    var intd = Object.values(sv).filter(function(x){return x.status==='Interested'||x.status==='Follow Up';}).length;
+    var notint = Object.values(sv).filter(function(x){return x.status==='Not Interested'||x.status==='Closed Lost';}).length;
+    var pipelineVal = CRM.reduce(function(s,x){var ld=sv[x.id];return s + (ld?.status?x.totalValue:0);},0);
+    
+    // LOCAL CALL DATA from saved outcomes
+    var localCalls = [];
+    var localOutcomes = {};
+    var localApptCount = 0;
+    var localDurationTotal = 0;
+    var localDurationCount = 0;
+    var localObjCounts = {};
+    
+    Object.keys(sv).forEach(function(id) {
+      var ld = sv[id];
+      if (ld.lastOutcome) {
+        var o = ld.lastOutcome;
+        localCalls.push({id: id, outcome: o.outcome, duration: o.duration_minutes, appt: o.appointment_booked, notes: o.notes, date: o.called_at, objections: o.objectives || o.objections || []});
+        localOutcomes[o.outcome] = (localOutcomes[o.outcome] || 0) + 1;
+        if (o.appointment_booked) localApptCount++;
+        if (o.duration_minutes) { localDurationTotal += o.duration_minutes; localDurationCount++; }
+        (o.objections || []).forEach(function(obj) { localObjCounts[obj] = (localObjCounts[obj] || 0) + 1; });
+      }
+      if (ld.calls && Array.isArray(ld.calls)) {
+        ld.calls.forEach(function(c) {
+          localCalls.push({id: id, outcome: c.outcome, duration: c.duration_minutes, appt: c.appointment_booked, notes: c.notes, date: c.called_at, objections: c.objections || []});
+          localOutcomes[c.outcome] = (localOutcomes[c.outcome] || 0) + 1;
+          if (c.appointment_booked) localApptCount++;
+          if (c.duration_minutes) { localDurationTotal += c.duration_minutes; localDurationCount++; }
+          (c.objections || []).forEach(function(obj) { localObjCounts[obj] = (localObjCounts[obj] || 0) + 1; });
+        });
+      }
+    });
+    localCalls.sort(function(a,b) { return (b.date||'').localeCompare(a.date||''); });
+
+    h += '<div class="sr">';
+    h += '<div class="sc"><div class="n b">' + total + '</div><div class="l">Total CRM Leads</div></div>';
+    h += '<div class="sc"><div class="n b">' + called + '</div><div class="l">Contacted</div></div>';
+    h += '<div class="sc"><div class="n g">' + won + '</div><div class="l">Closed Won</div></div>';
+    h += '<div class="sc"><div class="n o">' + intd + '</div><div class="l">Interested</div></div>';
+    h += '<div class="sc"><div class="n r">' + notint + '</div><div class="l">Not Interested</div></div>';
+    h += '<div class="sc"><div class="n" style="color:#8e24aa">$' + (pipelineVal/1000).toFixed(0) + 'K</div><div class="l">Pipeline Value</div></div>';
+    h += '</div>';
+
+    // Conversion funnel
+    var funnel = [
+      {l:'Total CRM Leads', v:total},
+      {l:'Contacted', v:called},
+      {l:'Interested', v:intd + won},
+      {l:'Closed Won', v:won},
+    ];
+    h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">CRM Conversion Funnel</strong></div>';
+    h += '<div class="tb"><table><thead><tr><th>Stage</th><th>Leads</th><th>% of Total</th><th>Bar</th></tr></thead><tbody>';
+    funnel.forEach(function(f, i) {
+      var pct = total > 0 ? Math.round(f.v/total*100) : 0;
+      var colors = ['b','b','o','g'];
+      h += '<tr><td><strong style="color:#1a1a2e;font-size:11px">' + f.l + '</strong></td><td>' + f.v + '</td><td>' + pct + '%</td>';
+      h += '<td style="width:180px"><div class="bar" style="height:16px;background:#eef0f6;border-radius:4px;overflow:hidden"><div class="fill ' + colors[i] + '" style="width:' + pct + '%;height:100%;border-radius:4px"><span class="lbl" style="position:absolute;left:6px;top:0;font-size:11px;color:#1a1a2e;line-height:16px">' + pct + '%</span></div></div></td></tr>';
+    });
+    h += '</tbody></table></div>';
+
+    // Pipeline status distribution
+    var stCounts = {};
+    ST.forEach(function(s){stCounts[s]=0;});
+    Object.values(sv).forEach(function(x){if(x.status&&stCounts[x.status]!==undefined)stCounts[x.status]++;});
+    var pipelineLeads = Object.keys(sv).length;
+    h += '<div style="margin-top:8px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Pipeline Status Distribution</strong></div>';
+    h += '<div class="tb"><table><thead><tr><th>Status</th><th>Count</th><th>% of Contacted</th></tr></thead><tbody>';
+    ST.forEach(function(s) {
+      var c = stCounts[s] || 0;
+      if (c === 0 && s !== 'New') return;
+      if (s === 'New') {
+        var newCount = total - pipelineLeads;
+        if (newCount <= 0) return;
+        h += '<tr><td><strong style="font-size:11px">' + s + '</strong></td><td>' + newCount + '</td><td>—</td></tr>';
+      } else {
+        var p = pipelineLeads > 0 ? Math.round(c/pipelineLeads*100) : 0;
+        var col = s==='Closed Won'?'#4caf50':s==='Not Interested'||s==='Closed Lost'?'#f44336':'#ff9800';
+        h += '<tr><td><strong style="font-size:11px;color:' + col + '">' + s + '</strong></td><td>' + c + '</td><td>' + p + '%</td></tr>';
+      }
+    });
+    h += '</tbody></table></div>';
+
+    // ─── LOCAL CALL DATA (from outcome forms) ───
+    var localTotal = localCalls.length;
+    if (localTotal > 0) {
+      var localAvgDur = localDurationCount > 0 ? Math.round(localDurationTotal/localDurationCount) : 0;
+      h += '<div style="margin-top:10px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#43a047">Your Call Activity</strong> <span style="color:#8888aa;font-size:11px">(logged from outcome forms)</span></div>';
+      h += '<div class="sr">';
+      h += '<div class="sc"><div class="n b">' + localTotal + '</div><div class="l">Calls Logged</div></div>';
+      h += '<div class="sc"><div class="n" style="color:#6c63ff">' + localAvgDur + 'm</div><div class="l">Avg Duration</div></div>';
+      h += '<div class="sc"><div class="n" style="color:#6c63ff">' + localDurationTotal + 'm</div><div class="l">Total Talk Time</div></div>';
+      h += '<div class="sc"><div class="n g">' + localApptCount + '</div><div class="l">Appointments</div></div>';
+      h += '<div class="sc"><div class="n" style="color:#8e24aa">' + Math.round(localApptCount/localTotal*100) + '%</div><div class="l">Appt Rate</div></div>';
+      h += '</div>';
+
+      // Outcome breakdown
+      var outcomeLabels = {'Interested':'Interested','Follow Up':'Follow Up','Not Interested':'Not Interested','No Answer':'No Answer','Wrong Number':'Wrong Number','Callback':'Callback'};
+      var outcomeColors = {'Interested':'g','Follow Up':'o','Not Interested':'r','No Answer':'r','Wrong Number':'r','Callback':'o'};
+      h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Call Outcomes</strong></div>';
+      h += '<div class="tb"><table><thead><tr><th>Outcome</th><th>Count</th><th>%</th><th>Bar</th></tr></thead><tbody>';
+      Object.keys(localOutcomes).sort().forEach(function(k) {
+        var v = localOutcomes[k], p = Math.round(v/localTotal*100), col = outcomeColors[k]||'b';
+        h += '<tr><td><strong style="font-size:11px;color:' + (k==='Interested'?'#4caf50':k==='Not Interested'?'#f44336':'#ff9800') + '">' + esc(k) + '</strong></td><td>' + v + '</td><td>' + p + '%</td>';
+        h += '<td style="width:180px"><div class="bar"><div class="fill ' + col + '" style="width:' + p + '%"><span class="lbl">' + p + '%</span></div></div></td></tr>';
+      });
+      h += '</tbody></table></div>';
+
+      // Duration buckets
+      var durs = {'< 1min':0,'1-3min':0,'3-5min':0,'5-10min':0,'> 10min':0};
+      localCalls.forEach(function(c) { var d=c.duration||0; if(d<1)durs['< 1min']++;else if(d<3)durs['1-3min']++;else if(d<5)durs['3-5min']++;else if(d<10)durs['5-10min']++;else durs['> 10min']++; });
+      h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Call Duration</strong></div>';
+      h += '<div class="tb"><table><thead><tr><th>Duration</th><th>Count</th><th>%</th><th>Bar</th></tr></thead><tbody>';
+      Object.keys(durs).forEach(function(k) { var v=durs[k]; if(v===0)return; var p=Math.round(v/localTotal*100);
+        h += '<tr><td style="font-size:11px">' + k + '</td><td>' + v + '</td><td>' + p + '%</td>';
+        h += '<td style="width:180px"><div class="bar"><div class="fill b" style="width:' + p + '%"><span class="lbl">' + p + '%</span></div></div></td></tr>';
+      });
+      h += '</tbody></table></div>';
+
+      // Objections
+      var objKeys = Object.keys(localObjCounts);
+      if (objKeys.length > 0) {
+        h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Objections</strong></div>';
+        h += '<div class="tb"><table><thead><tr><th>Objection</th><th>Count</th><th>% of Calls</th></tr></thead><tbody>';
+        objKeys.sort().forEach(function(k) {
+          h += '<tr><td style="font-size:11px">' + esc(k) + '</td><td>' + localObjCounts[k] + '</td><td>' + Math.round(localObjCounts[k]/localTotal*100) + '%</td></tr>';
+        });
+        h += '</tbody></table></div>';
+      }
+
+      // Recent calls
+      h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Recent Calls Logged</strong></div>';
+      h += '<div class="tb"><table><thead><tr><th>Date</th><th>Business</th><th>Dur</th><th>Outcome</th><th>Appt</th><th>Notes</th></tr></thead><tbody>';
+      localCalls.slice(0,20).forEach(function(c) {
+        var x = CRM.find(function(d){return d.id==c.id;});
+        var col = c.outcome==='Interested'?'#4caf50':c.outcome==='Not Interested'?'#f44336':'#ff9800';
+        h += '<tr class="c" onclick="openM(' + c.id + ')"><td style="color:#8888aa;font-size:12px">' + (c.date||'').substring(0,10) + '</td>';
+        h += '<td style="font-size:11px"><strong>' + esc(x?x.name:'') + '</strong></td>';
+        h += '<td>' + (c.duration||0) + 'm</td>';
+        h += '<td style="color:' + col + ';font-size:12px">' + esc(c.outcome) + '</td>';
+        h += '<td>' + (c.appt?'Yes':'No') + '</td>';
+        h += '<td style="color:#8888aa;font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc((c.notes||'').substring(0,30)) + '</td></tr>';
+      });
+      h += '</tbody></table></div>';
+    }
+
+    // Agent call data (enhancement when available)
+    if (agentData && agentData.total_calls > 0) {
+      h += '<div style="margin-top:10px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#6c63ff">Call Agent Performance</strong> <span style="color:#8888aa;font-size:11px">(from agent dashboard)</span></div>';
+      h += '<div class="sr">';
+      h += '<div class="sc"><div class="n b">' + (agentData.total_calls||0) + '</div><div class="l">Agent Calls</div></div>';
+      h += '<div class="sc"><div class="n" style="color:#6c63ff">' + (agentData.avg_duration||'0') + 'm</div><div class="l">Avg Duration</div></div>';
+      h += '<div class="sc"><div class="n" style="color:#6c63ff">' + (agentData.total_duration||'0') + 'm</div><div class="l">Total Talk</div></div>';
+      h += '<div class="sc"><div class="n g">' + (agentData.appointment_rate||'0') + '%</div><div class="l">Appt Rate</div></div>';
+      h += '<div class="sc"><div class="n g">' + (agentData.hot||0) + '</div><div class="l">Hot</div></div>';
+      h += '<div class="sc"><div class="n o">' + (agentData.warm||0) + '</div><div class="l">Warm</div></div>';
+      h += '<div class="sc"><div class="n" style="color:#8e24aa">$' + (agentData.projected_revenue||'0') + '</div><div class="l">Projected Rev</div></div>';
+      h += '</div>';
+      if (agentData.outcomes && agentData.outcomes.length > 0) {
+        h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Agent Outcomes</strong></div><div class="tb"><table><thead><tr><th>Outcome</th><th>Count</th><th>%</th><th>Bar</th></tr></thead><tbody>';
+        agentData.outcomes.forEach(function(o) {
+          h += '<tr><td style="font-size:11px">' + esc(o.label) + '</td><td>' + o.count + '</td><td>' + o.pct + '%</td>';
+          var c = o.color==='g'?'#4caf50':o.color==='r'?'#f44336':o.color==='o'?'#ff9800':'#4a6cf7';
+          h += '<td style="width:180px"><div class="bar"><div style="height:100%;width:' + o.pct + '%;border-radius:4px;background:' + c + '"><span class="lbl" style="position:absolute;left:6px;top:0;font-size:11px;color:#1a1a2e;line-height:16px">' + o.pct + '%</span></div></div></td></tr>';
+        });
+        h += '</tbody></table></div>';
+      }
+      if (agentLogs.length > 0) {
+        h += '<div style="margin-top:6px;margin-bottom:4px;font-size:12px;color:#8888aa"><strong style="color:#444">Recent Agent Calls</strong></div><div class="tb"><table><thead><tr><th>Date</th><th>Business</th><th>Dur</th><th>Outcome</th><th>Score</th><th>Appt</th></tr></thead><tbody>';
+        agentLogs.slice(0,10).forEach(function(l) {
+          var o = l.outcome; if (typeof o === 'object' && o) o = o.outcome || 'unknown';
+          var oc = o==='interested'?'#4caf50':o==='not interested'?'#f44336':'#ff9800';
+          h += '<tr><td style="color:#8888aa;font-size:12px">' + (l.logged_at||'').substring(0,10) + '</td><td style="font-size:11px"><strong>' + esc(l.business_name||'') + '</strong></td><td>' + (l.duration_minutes||0) + 'm</td><td style="color:' + oc + ';font-size:12px">' + esc(o) + '</td><td>' + (l.lead_score||'-') + '</td><td>' + (l.appointment_booked?'Yes':'No') + '</td></tr>';
+        });
+        h += '</tbody></table></div>';
+      }
+    }
+
+    document.getElementById('cx').innerHTML = h;
+  }
+
+  // Fetch agent data
+  var finished = false;
+  Promise.all([
+    fetch('http://localhost:3000/api/report-data?period=all').then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(d){agentData=d;}).catch(function(){}),
+    fetch('http://localhost:3000/api/call-logs').then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(d){agentLogs=d;}).catch(function(){})
+  ]).finally(function() { finish(); });
+
+  // Timeout fallback
+  setTimeout(function() { finish(); }, 3000);
+}
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function openM(id) {
+  const x = CRM.find(function(d){return d.id===id;}); if(!x) return;
+  const ld = sv[id]||{};
+  document.getElementById('mt').textContent = x.name;
+  document.getElementById('mb').innerHTML =
+    '<div class="rw"><div class="lbl">Category</div><div class="val">' + esc(x.cat) + '</div></div>' +
+    '<div class="rw"><div class="lbl">Email</div><div class="val">' + esc(x.email||'\u2014') + '</div></div>' +
+    '<div class="rw"><div class="lbl">Phone</div><div class="val">' + esc(x.phone||'\u2014') + '</div></div>' +
+    '<div class="rw"><div class="lbl">Website</div><div class="val">' + (x.website?'<a href="' + esc(x.website) + '" target="_blank">' + esc(x.website) + '</a>':'<span style="color:#e53935;font-weight:600">No website</span>') + '</div></div>' +
+    '<div class="rw"><div class="lbl">Status</div><div class="val"><span class="st ' + x.ws + '">' + (x.ws==='working'?'Working':x.ws==='broken'?'Has Issues':'No Website') + '</span></div></div>' +
+    '<div class="rw"><div class="lbl">Priority</div><div class="val"><span style="color:' + (x.priority==='high'?'#f44336':x.priority==='medium'?'#ff9800':'#4caf50') + ';font-weight:600">' + x.priority.toUpperCase() + '</span></div></div>' +
+    '<div class="rw"><div class="lbl">Address</div><div class="val">' + esc(x.address||'\u2014') + '</div></div>' +
+    '<div class="rw"><div class="lbl">Source</div><div class="val" style="color:#8888aa;font-size:11px">' + esc(x.source) + '</div></div>' +
+    '<div class="rw"><div class="lbl">Services</div><div class="val">' + x.services.split(', ').map(function(s){return '<span class="svc">' + esc(s) + '</span>';}).join(' ') + '</div></div>' +
+    '<div class="rw"><div class="lbl">Value Prop</div><div class="val" style="color:#6c63ff;font-weight:600;font-size:13px">' + esc(getVP(x)) + '</div></div>' +
+    '<div class="rw"><div class="lbl">Last Call</div><div class="val" style="font-size:12px">' + (ld.lastOutcome?'<span style="color:' + (ld.lastOutcome.outcome==='Interested'?'#43a047':ld.lastOutcome.outcome==='Not Interested'?'#e53935':'#fb8c00') + '">' + esc(ld.lastOutcome.outcome) + '</span> \u2014 ' + (ld.lastOutcome.duration_minutes||'?') + 'min' + (ld.lastOutcome.appointment_booked?' \u2022 Yes':' \u2022 No') + '':'None logged') + '</div></div>' +
+    '<div class="rw"><div class="lbl">Est. Value</div><div class="val" style="color:#43a047;font-weight:700;font-size:14px">$' + x.totalValue + '</div></div>' +
+    '<div class="rw"><div class="lbl">Lead Status</div><div class="val"><select class="sts" onchange="sl(' + id + ',\'status\',this.value);showT(\'Status: \'+this.value)">' +
+      ST.map(function(s){return '<option value="' + s + '"' + ((ld.status||'New')===s?' selected':'') + '>' + s + '</option>';}).join('') +
+    '</select></div></div>' +
+    '<div class="rw" style="border:none"><div class="lbl">Notes</div></div>' +
+    '<textarea placeholder="Add notes..." onchange="sl(' + id + ',\'notes\',this.value)">' + esc(ld.notes||'') + '</textarea>';
+  var hasAgent = false; // Will be set to true if agent API responds
+  document.getElementById('mf').innerHTML =
+    (x.phone?'<button class="mc" onclick="doCall(' + id + ')">&#9742; Call</button><button class="mw" onclick="doAgentCall(' + id + ')" title="AI-powered call via agent">&#129302; AI Call</button>':'') +
+    (x.email?'<button class="me" onclick="doMail(' + id + ',\'' + esc(x.email) + '\')">&#9993; Email</button>':'') +
+    (x.website?'<button class="mw" onclick="window.open(\'' + esc(x.website) + '\',\'_blank\')">&#127760; Visit</button>':'') +
+    '<button class="ms" onclick="sl(' + id + ',\'saved\',true);showT(\'Saved\')">&#11088; Save</button>';
+  document.getElementById('mo').classList.add('on');
+}
+function closeM() { document.getElementById('mo').classList.remove('on'); }
+
+// ─── CALL OUTCOME FORM ───
+var callStartTime = null;
+
+function doCall(id) {
+  var x = CRM.find(function(d){return d.id===id;});
+  if (!x || !x.phone) { showT('No phone number'); return; }
+  
+  sl(id,'status','Called'); sl(id,'called',new Date().toISOString());
+  callStartTime = Date.now();
+  
+  // Open phone dialer directly (most reliable)
+  window.open('tel:' + x.phone);
+  showT('Calling ' + x.phone);
+  closeM();
+  
+  // Show outcome form after the call (5s delay for them to finish)
+  setTimeout(function() { showCallOutcomeForm(id); }, 5000);
+}
+
+function doAgentCall(id) {
+  var x = CRM.find(function(d){return d.id===id;});
+  if (!x || !x.phone) { showT('No phone number'); return; }
+  
+  sl(id,'status','Called'); sl(id,'called',new Date().toISOString());
+  callStartTime = Date.now();
+  
+  var agentUrl = 'http://localhost:3000';
+  closeM();
+  
+  // Show live tracking popup
+  showCallTracker(id, 'Connecting to AI agent...');
+  
+  fetch(agentUrl + '/api/call-lead', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      phone: x.phone,
+      business_name: x.name,
+      industry: x.cat,
+      crm_id: id,
+      source: 'CRM'
+    })
+  })
+  .then(function(r) {
+    if (!r.ok) throw Error('Agent unreachable');
+    return r.json();
+  })
+  .then(function(d) {
+    updateCallTracker('Call initiated. Waiting for answer...');
+    // Start polling for result
+    pollCallStatus(id);
+  })
+  .catch(function() {
+    updateCallTracker('Agent offline. Use regular Call button.', true);
+    setTimeout(function() { closeCallTracker(); }, 3000);
+  });
+}
+
+// ─── LIVE CALL TRACKER ───
+var callTrackerInterval = null;
+var callTrackerId = null;
+
+function showCallTracker(id, msg) {
+  callTrackerId = id;
+  var existing = document.getElementById('call-tracker');
+  if (existing) existing.remove();
+  
+  var div = document.createElement('div');
+  div.id = 'call-tracker';
+  div.innerHTML =
+    '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:250;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)">' +
+      '<div style="background:#fff;border:1px solid #e0e4ed;border-radius:14px;padding:28px 36px;width:380px;text-align:center;box-shadow:0 25px 80px rgba(0,0,0,.15);animation:up .2s">' +
+        '<div id="ct-status" style="font-size:42px;margin-bottom:10px">&#128175;</div>' +
+        '<div id="ct-title" style="font-size:16px;color:#1a1a2e;font-weight:600;margin-bottom:4px">' + esc(CRM.find(function(d){return d.id===id;})?.name||'') + '</div>' +
+        '<div id="ct-msg" style="font-size:13px;color:#8888aa;margin-bottom:16px">' + msg + '</div>' +
+        '<div style="height:4px;background:#eef0f6;border-radius:2px;overflow:hidden;margin-bottom:14px">' +
+          '<div id="ct-bar" style="height:100%;width:0%;background:#6c63ff;border-radius:2px;transition:width 1s"></div>' +
+        '</div>' +
+        '<div id="ct-time" style="font-size:12px;color:#aaa;margin-bottom:14px">Elapsed: 0s</div>' +
+        '<button onclick="closeCallTracker()" style="padding:8px 20px;border-radius:8px;border:1px solid #dde1ec;background:#fff;color:#666;cursor:pointer;font-size:13px">Cancel & Log Manually</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(div);
+  
+  // Animate bar
+  var start = Date.now();
+  callTrackerInterval = setInterval(function() {
+    var elapsed = Math.floor((Date.now() - start) / 1000);
+    var el = document.getElementById('ct-time');
+    if (el) el.textContent = 'Elapsed: ' + elapsed + 's';
+    var bar = document.getElementById('ct-bar');
+    if (bar) {
+      var pct = Math.min(elapsed / 120 * 100, 95);
+      bar.style.width = pct + '%';
+    }
+    // Update status emoji periodically
+    var st = document.getElementById('ct-status');
+    if (st) {
+      if (elapsed < 15) st.textContent = '\uD83D\uDC4B'; // waving
+      else if (elapsed < 45) st.textContent = '\uD83D\uDCAC'; // talking
+      else if (elapsed < 90) st.textContent = '\uD83D\uDCCB'; // wrapping up
+      else st.textContent = '\u23F3'; // waiting
+    }
+  }, 1000);
+}
+
+function updateCallTracker(msg, isError) {
+  var el = document.getElementById('ct-msg');
+  if (el) el.textContent = msg;
+  if (isError) {
+    var st = document.getElementById('ct-status');
+    if (st) st.textContent = '\u274C';
+  }
+}
+
+function closeCallTracker() {
+  if (callTrackerInterval) { clearInterval(callTrackerInterval); callTrackerInterval = null; }
+  var el = document.getElementById('call-tracker');
+  if (el) el.remove();
+  if (callTrackerId) {
+    showCallOutcomeForm(callTrackerId);
+    callTrackerId = null;
+  }
+}
+
+function pollCallStatus(id) {
+  var agentUrl = 'http://localhost:3000';
+  var attempts = 0;
+  var maxAttempts = 60; // 5 min max
+  
+  var poller = setInterval(function() {
+    attempts++;
+    
+    fetch(agentUrl + '/api/call-logs')
+      .then(function(r) { if (!r.ok) throw Error(); return r.json(); })
+      .then(function(logs) {
+        // Find log matching our CRM lead
+        var match = null;
+        if (Array.isArray(logs)) {
+          for (var i = 0; i < logs.length; i++) {
+            var l = logs[i];
+            var crmId = l.crm_id || (l.metadata && l.metadata.crm_id) || '';
+            var phone = l.phone || '';
+            if (crmId == id || (phone && CRM.find(function(d){return d.id===id;})?.phone === phone)) {
+              match = l;
+              break;
+            }
+          }
+        }
+        
+        if (match) {
+          clearInterval(poller);
+          updateCallTracker('Call completed! Processing...');
+          document.getElementById('ct-status').textContent = '\u2705';
+          document.getElementById('ct-bar').style.width = '100%';
+          document.getElementById('ct-bar').style.background = '#4caf50';
+          
+          // Save agent outcome to localStorage
+          var outcome = match.outcome || {};
+          if (typeof outcome === 'string') outcome = { outcome: outcome };
+          var agentResult = {
+            outcome: outcome.outcome === 'interested' ? 'Interested' :
+                     outcome.outcome === 'not interested' ? 'Not Interested' :
+                     outcome.outcome === 'callback requested' ? 'Callback' :
+                     outcome.outcome === 'no answer' ? 'No Answer' : 'Follow Up',
+            duration_minutes: match.duration_minutes || Math.round((match.duration_seconds||0)/60) || 2,
+            appointment_booked: match.appointment_booked || false,
+            appointment_date: match.appointment_date || '',
+            appointment_time: match.appointment_time || '',
+            notes: (typeof outcome === 'object' ? outcome.notes || '' : '') + ' (from AI call)',
+            objections: outcome.objections || [],
+            from_agent: true,
+            agent_call_id: match.call_id || '',
+            recording_url: match.recording_url || '',
+          };
+          sl(id, 'status', agentResult.outcome);
+          sl(id, 'lastOutcome', agentResult);
+          sl(id, 'called', new Date().toISOString());
+          if (!sv[id].calls) sv[id].calls = [];
+          sv[id].calls.push(agentResult);
+          sv[id].t = Date.now();
+          localStorage.setItem('crm', JSON.stringify(sv));
+          
+          setTimeout(function() {
+            closeCallTracker();
+            showT('AI call completed: ' + agentResult.outcome);
+            render();
+          }, 1500);
+        } else if (attempts >= maxAttempts) {
+          clearInterval(poller);
+          updateCallTracker('No result received. Log manually.', true);
+          setTimeout(function() { closeCallTracker(); }, 2000);
+        } else {
+          updateCallTracker('AI is talking to the lead... (' + (attempts * 5) + 's)');
+        }
+      })
+      .catch(function() {
+        if (attempts >= maxAttempts) {
+          clearInterval(poller);
+          updateCallTracker('Agent disconnected. Log manually.', true);
+          setTimeout(function() { closeCallTracker(); }, 2000);
+        }
+      });
+  }, 5000);
+}
+
+function showCallOutcomeForm(id) {
+  var x = CRM.find(function(d){return d.id===id;});
+  if (!x) return;
+  var ld = sv[id] || {};
+  var elapsed = callStartTime ? Math.round((Date.now() - callStartTime) / 60000) : 0;
+  if (elapsed < 1) elapsed = 2; // assume at least 2 min
+  
+  var mh = document.getElementById('mt');
+  var mb = document.getElementById('mb');
+  var mf = document.getElementById('mf');
+  
+  mh.textContent = 'Call Outcome: ' + x.name;
+  
+  var prevOutcome = ld.lastOutcome || {};
+  mb.innerHTML =
+    '<div style="margin-bottom:10px;font-size:13px;color:#8888aa">Log the result of this call</div>' +
+    
+    '<div class="rw"><div class="lbl">Outcome</div><div class="val"><select id="co-outcome" style="padding:6px 10px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:6px;color:#333;font-size:13px;outline:none;width:100%">' +
+      '<option value="Interested">Interested — wants service</option>' +
+      '<option value="Follow Up" selected>Follow Up — needs more time</option>' +
+      '<option value="Not Interested">Not Interested</option>' +
+      '<option value="No Answer">No Answer / No Pickup</option>' +
+      '<option value="Wrong Number">Wrong Number</option>' +
+      '<option value="Callback">Callback Requested</option>' +
+    '</select></div></div>' +
+    
+    '<div class="rw"><div class="lbl">Duration</div><div class="val">' +
+      '<input type="number" id="co-duration" value="' + elapsed + '" min="0" max="60" style="width:70px;padding:6px 10px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:6px;color:#333;font-size:13px;outline:none"> minutes</div></div>' +
+    
+    '<div class="rw"><div class="lbl">Appointment</div><div class="val">' +
+      '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><input type="checkbox" id="co-appt" onchange="document.getElementById(\'co-appt-date\').style.display=this.checked?\'\':\'none\'" style="accent-color:#6c63ff;width:16px;height:16px"> Booked appointment</label>' +
+      '<div id="co-appt-date" style="display:none;margin-top:6px;display:none">' +
+        '<input type="date" id="co-appt-date-val" style="padding:6px 10px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:6px;color:#333;font-size:12px;outline:none;margin-right:6px">' +
+        '<input type="time" id="co-appt-time-val" style="padding:6px 10px;background:#f4f6fb;border:1px solid #dde1ec;border-radius:6px;color:#333;font-size:12px;outline:none">' +
+      '</div></div></div>' +
+    
+    '<div class="rw"><div class="lbl">Objections</div><div class="val">' +
+      '<label style="display:block;margin:3px 0;font-size:13px;cursor:pointer"><input type="checkbox" class="co-obj" value="too expensive" style="accent-color:#6c63ff;width:15px;height:15px;margin-right:6px"> Too expensive / no budget</label>' +
+      '<label style="display:block;margin:3px 0;font-size:13px;cursor:pointer"><input type="checkbox" class="co-obj" value="not now" style="accent-color:#6c63ff;width:15px;height:15px;margin-right:6px"> Not now / busy</label>' +
+      '<label style="display:block;margin:3px 0;font-size:13px;cursor:pointer"><input type="checkbox" class="co-obj" value="already have" style="accent-color:#6c63ff;width:15px;height:15px;margin-right:6px"> Already have a provider</label>' +
+      '<label style="display:block;margin:3px 0;font-size:13px;cursor:pointer"><input type="checkbox" class="co-obj" value="need to decide" style="accent-color:#6c63ff;width:15px;height:15px;margin-right:6px"> Needs to decide / consult</label>' +
+      '<label style="display:block;margin:3px 0;font-size:13px;cursor:pointer"><input type="checkbox" class="co-obj" value="not interested" style="accent-color:#6c63ff;width:15px;height:15px;margin-right:6px"> Not interested at all</label>' +
+    '</div></div>' +
+    
+    '<div class="rw" style="border:none"><div class="lbl">Notes</div></div>' +
+    '<textarea id="co-notes" placeholder="What did they say? Any details..." style="margin-top:4px">' + esc(prevOutcome.notes||'') + '</textarea>';
+  
+  mf.innerHTML =
+    '<button class="mc" onclick="saveCallOutcome(' + id + ')" style="flex:1;padding:8px">Save Outcome</button>' +
+    '<button class="mw" onclick="closeM()" style="margin-left:auto">Skip</button>';
+  
+  document.getElementById('mo').classList.add('on');
+}
+
+function saveCallOutcome(id) {
+  var outcome = document.getElementById('co-outcome').value;
+  var duration = parseInt(document.getElementById('co-duration').value) || 0;
+  var apptBooked = document.getElementById('co-appt').checked;
+  var apptDate = document.getElementById('co-appt-date-val').value || '';
+  var apptTime = document.getElementById('co-appt-time-val').value || '';
+  var notes = document.getElementById('co-notes').value || '';
+  var objections = [];
+  document.querySelectorAll('.co-obj:checked').forEach(function(el) { objections.push(el.value); });
+  
+  // Build call record
+  var callRecord = {
+    outcome: outcome,
+    duration_minutes: duration,
+    appointment_booked: apptBooked,
+    appointment_date: apptDate,
+    appointment_time: apptTime,
+    objections: objections,
+    notes: notes,
+    called_at: new Date().toISOString(),
+  };
+  
+  // Save to lead
+  sl(id, 'status', outcome);
+  sl(id, 'lastOutcome', callRecord);
+  sl(id, 'called', new Date().toISOString());
+  
+  // Append to calls array
+  if (!sv[id].calls) sv[id].calls = [];
+  sv[id].calls.push(callRecord);
+  sv[id].t = Date.now();
+  localStorage.setItem('crm', JSON.stringify(sv));
+  
+  callInProgressId = null;
+  callStartTime = null;
+  
+  closeM(); render();
+  showT('Outcome saved: ' + outcome);
+}
+
+function doMail(id, e) { window.open('mailto:'+e); sl(id,'status','Contacted'); showT('Email logged'); closeM(); render(); }
+
+// ═══════════════════════════════════════
+// NAVIGATION & ACTIONS
+// ═══════════════════════════════════════
+function goTab(t) { tab=t; pg=0; lk=''; ck=''; sf=''; sk=''; sel.clear(); buildNav(); render(); }
+function goProspect(k) { tab='prospect'; lk=k; pg=0; sf=''; sk=''; buildNav(); render(); }
+function goFirstProspect() { tab='prospect'; lk='hot-leads'; pg=0; sf=''; sk=''; buildNav(); render(); }
+function doSearch() { sq=document.getElementById('q').value; ck=document.getElementById('catSel').value; pg=0; sk=''; sel.clear(); render(); }
+function clearFilters() { document.getElementById('q').value=''; document.getElementById('catSel').value=''; sq=''; ck=''; sf=''; sk=''; pg=0; sel.clear(); render(); }
+function setSF(v) { sf=v; pg=0; sel.clear(); document.querySelectorAll('.fb button').forEach(function(b){b.classList.toggle('on',b.textContent.trim().indexOf(v===''?'All':v==='none'?'No Website':v==='working'?'Working':v==='broken'?'Issues':'Has Email')===0);}); render(); }
+function setSC(c) { if(sc===c) sd*=-1; else { sc=c; sd=1; } render(); }
+function goP(p) { pg=p; render(); var el=document.querySelector('.tb'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
+
+// ─── BULK ───
+function toggleSel(id) { sel.has(id)?sel.delete(id):sel.add(id); render(); }
+function toggleAll() {
+  const d = getData(), pp2 = parseInt(document.getElementById('pp').value);
+  const pd = d.slice(pg*pp2, Math.min((pg+1)*pp2, d.length));
+  const allSel = pd.every(function(x){return sel.has(x.id);});
+  pd.forEach(function(x){allSel?sel.delete(x.id):sel.add(x.id);});
+  render();
+}
+function bulkUpdate() {
+  const st = document.getElementById('bulkSt').value;
+  sel.forEach(function(id){sl(id,'status',st);});
+  showT('Updated ' + sel.size + ' leads to "' + st + '"');
+  sel.clear(); render();
+}
+function bulkCall() {
+  var count = 0;
+  sel.forEach(function(id) {
+    var x = CRM.find(function(d){return d.id===id;});
+    if (x && x.phone) {
+      sl(id,'status','Called'); sl(id,'called',new Date().toISOString());
+      // Try agent for each
+      fetch('http://localhost:3000/crm/call/' + id, { method: 'POST' }).catch(function(){});
+      count++;
+    }
+  });
+  showT('Called ' + count + ' leads via agent');
+  sel.clear(); render();
+}
+
+// ─── EXPORT ───
+function exportCSV() {
+  const d = getData();
+  let csv = 'ID,Business Name,Category,Email,Phone,Website,Website Status,Est. Value,Address\n';
+  d.forEach(function(x) {
+    var esc2 = function(s) { return '"' + (s||'').replace(/"/g,'""') + '"'; };
+    csv += x.id + ',' + esc2(x.name) + ',' + esc2(x.cat) + ',' + esc2(x.email) + ',' + esc2(x.phone) + ',' + esc2(x.website) + ',' + x.ws + ',' + x.totalValue + ',' + esc2(x.address) + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'crm-export-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showT('Exported ' + d.length + ' leads');
+}
+
+// ─── BACKUP / RESTORE ───
+function backup() {
+  const blob = new Blob([JSON.stringify(sv,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'crm-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showT('Backup downloaded');
+}
+function restore(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function() {
+    try { sv = JSON.parse(reader.result); localStorage.setItem('crm', JSON.stringify(sv)); showT('Data restored (' + Object.keys(sv).length + ' leads)'); render(); }
+    catch(e2) { showT('Invalid backup file'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function showT(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},1600); }
+
+// ─── SYNC TO CALL AGENT ───
+function syncToAgent() {
+  const agentUrl = 'http://localhost:3000/crm/sync-statuses';
+  
+  // Build statuses from localStorage
+  const statuses = {};
+  for (const id in sv) {
+    if (sv.hasOwnProperty(id)) {
+      const item = CRM.find(function(x){return x.id == id;});
+      statuses[id] = {
+        phone: item ? item.phone : '',
+        name: item ? item.name : '',
+        status: sv[id].status || 'new',
+        notes: sv[id].notes || '',
+        calledAt: sv[id].called || '',
+        saved: sv[id].saved || false
+      };
+    }
+  }
+  
+  // Add all uncontacted leads as "new"
+  CRM.forEach(function(x) {
+    if (!statuses[x.id]) {
+      statuses[x.id] = { phone: x.phone, name: x.name, status: 'new', notes: '', saved: false };
+    }
+  });
+  
+  showT('Sending ' + Object.keys(statuses).length + ' lead statuses...');
+  
+  // Try posting to call-agent dashboard
+  fetch(agentUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ statuses: statuses })
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(function(d) {
+    showT('Sent ' + d.message + ' to call agent');
+  })
+  .catch(function(err) {
+    // Fallback: download as JSON file
+    showT('Agent not running. Downloading file...');
+    var blob = new Blob([JSON.stringify(statuses, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'crm-sync.json';
+    a.click();
+    showT('Downloaded crm-sync.json. Place in project folder & run: python sync_to_call_agent.py');
+  });
+}
+
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeM(); if(e.ctrlKey&&e.key==='f'){e.preventDefault();document.getElementById('q').focus();} });
+
+buildNav(); render();
+</script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales System — Kigali Business Directory</title>
+<script src="sales-data.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e0e0e0; }
+
+/* ── TOP BAR ── */
+.top { background: #1a1d2e; border-bottom: 1px solid #2a2d3e; padding: 14px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; }
+.top h1 { font-size: 17px; color: #fff; }
+.top .sub { font-size: 12px; color: #888; }
+.btn-toggle { display: none; background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer; }
+
+/* ── LAYOUT ── */
+.wrap { display: flex; min-height: calc(100vh - 53px); }
+
+/* ── SIDEBAR ── */
+.side { width: 240px; background: #151827; border-right: 1px solid #2a2d3e; flex-shrink: 0; overflow-y: auto; }
+.side-grp { padding: 16px 16px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #555; }
+.side-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; cursor: pointer; font-size: 13px; color: #aaa; border-left: 3px solid transparent; transition: all 0.15s; }
+.side-item:hover { background: #1e2136; color: #ddd; }
+.side-item.active { background: #1a1d2e; border-left-color: #4FC3F7; color: #4FC3F7; font-weight: 600; }
+.side-item .badge { background: #2a2d3e; color: #999; font-size: 10px; padding: 1px 8px; border-radius: 8px; }
+.side-item.active .badge { background: #4FC3F7; color: #0f1117; }
+.side-item .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.dot.r { background: #ef5350; } .dot.g { background: #66BB6A; } .dot.o { background: #FFA726; }
+
+/* ── MAIN ── */
+.main { flex: 1; padding: 20px 24px; min-width: 0; overflow: auto; }
+
+/* ── LIST HEADER ── */
+.list-header { margin-bottom: 20px; }
+.list-header h2 { font-size: 22px; color: #fff; font-weight: 600; }
+.list-header .desc { color: #888; font-size: 13px; margin-top: 4px; }
+.list-header .meta { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+.list-header .meta span { font-size: 12px; color: #999; }
+.list-header .meta strong { color: #ddd; }
+
+/* ── STATS ROW ── */
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.metric { background: #1a1d2e; border: 1px solid #2a2d3e; border-radius: 10px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; }
+.metric:hover { border-color: #4FC3F7; }
+.metric .num { font-size: 22px; font-weight: 700; color: #fff; }
+.metric .lbl { font-size: 11px; color: #777; margin-top: 2px; }
+.metric.highlight { border-color: #4FC3F7; background: #1a1d2e; }
+.metric .sub { font-size: 11px; color: #4FC3F7; margin-top: 1px; }
+
+/* ── CONTROLS ── */
+.ctrl { background: #1a1d2e; border: 1px solid #2a2d3e; border-radius: 10px; padding: 10px 16px; margin-bottom: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.ctrl input { flex: 1; min-width: 160px; padding: 8px 12px; background: #0f1117; border: 1px solid #2a2d3e; border-radius: 6px; color: #e0e0e0; font-size: 13px; outline: none; }
+.ctrl input:focus { border-color: #4FC3F7; }
+.ctrl input::placeholder { color: #555; }
+.ctrl select { padding: 8px 12px; background: #0f1117; border: 1px solid #2a2d3e; border-radius: 6px; color: #e0e0e0; font-size: 12px; outline: none; }
+.ctrl .count { font-size: 12px; color: #666; margin-left: auto; white-space: nowrap; }
+
+/* ── STATUS BADGES ── */
+.status-fil { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.stat-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid #2a2d3e; background: transparent; color: #aaa; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+.stat-btn:hover { border-color: #555; color: #ddd; }
+.stat-btn.on { border-color: #4FC3F7; color: #4FC3F7; background: rgba(79,195,247,0.08); }
+.stat-btn .b { background: #2a2d3e; padding: 1px 7px; border-radius: 8px; font-size: 10px; margin-left: 4px; }
+.stat-btn.on .b { background: rgba(79,195,247,0.2); color: #4FC3F7; }
+
+/* ── TABLE ── */
+.tw { background: #1a1d2e; border: 1px solid #2a2d3e; border-radius: 10px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #151827; padding: 10px 13px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #666; cursor: pointer; user-select: none; white-space: nowrap; border-bottom: 1px solid #2a2d3e; }
+th:hover { color: #4FC3F7; }
+th .arr { margin-left: 2px; font-size: 9px; }
+td { padding: 8px 13px; font-size: 13px; border-bottom: 1px solid #222; color: #ccc; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #1e2136; }
+tr.c { cursor: pointer; }
+
+.tag { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.tag.working { background: rgba(102,187,106,0.12); color: #66BB6A; }
+.tag.broken { background: rgba(255,167,38,0.12); color: #FFA726; }
+.tag.none { background: rgba(239,83,80,0.12); color: #ef5350; }
+
+.svc { font-size: 11px; color: #888; }
+
+/* ── LEAD STATUS DROPDOWN ── */
+.sel-st { padding: 3px 6px; background: #0f1117; border: 1px solid #2a2d3e; border-radius: 4px; color: #e0e0e0; font-size: 11px; cursor: pointer; outline: none; }
+.sel-st option { background: #0f1117; }
+
+/* ── PAGINATION ── */
+.pag { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid #2a2d3e; font-size: 12px; color: #666; }
+.pag .pages { display: flex; gap: 3px; }
+.pag .pages button { min-width: 30px; height: 30px; border: 1px solid #2a2d3e; background: #0f1117; border-radius: 5px; cursor: pointer; font-size: 11px; color: #aaa; transition: all 0.1s; }
+.pag .pages button:hover { border-color: #4FC3F7; color: #4FC3F7; }
+.pag .pages button.on { background: #4FC3F7; color: #0f1117; border-color: #4FC3F7; }
+.pag .pages button:disabled { opacity: 0.25; cursor: default; }
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.on { display: flex; }
+.modal { background: #1a1d2e; border: 1px solid #2a2d3e; border-radius: 14px; width: 500px; max-width: 92vw; max-height: 82vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); animation: up 0.2s; }
+@keyframes up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.modal-hdr { padding: 18px 22px 14px; border-bottom: 1px solid #2a2d3e; display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-hdr h2 { font-size: 17px; color: #4FC3F7; }
+.modal-hdr .close { background: none; border: none; font-size: 22px; color: #666; cursor: pointer; }
+.modal-hdr .close:hover { color: #eee; }
+.modal-body { padding: 16px 22px; }
+.modal-body .rw { display: flex; padding: 8px 0; border-bottom: 1px solid #222; }
+.modal-body .rw:last-child { border: none; }
+.modal-body .l { width: 110px; font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.3px; flex-shrink: 0; }
+.modal-body .v { font-size: 13px; color: #ddd; word-break: break-word; }
+.modal-ftr { padding: 14px 22px; border-top: 1px solid #2a2d3e; display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-ftr button { padding: 7px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 500; }
+.call-btn { background: #2E7D32; color: #fff; } .call-btn:hover { background: #1B5E20; }
+.email-btn { background: #1565C0; color: #fff; } .email-btn:hover { background: #0D47A1; }
+.save-btn { background: #E65100; color: #fff; } .save-btn:hover { background: #BF360C; }
+.note-btn { background: #2a2d3e; color: #ddd; } .note-btn:hover { background: #3a3d4e; }
+
+/* ── NOTE INPUT ── */
+.note-area { margin-top: 10px; }
+.note-area textarea { width: 100%; padding: 8px 12px; background: #0f1117; border: 1px solid #2a2d3e; border-radius: 6px; color: #e0e0e0; font-size: 12px; resize: vertical; min-height: 60px; outline: none; font-family: inherit; }
+.note-area textarea:focus { border-color: #4FC3F7; }
+
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 50px 20px; color: #555; }
+.empty h3 { color: #777; margin-bottom: 4px; font-size: 15px; }
+
+/* ── TOAST ── */
+#toast { position: fixed; bottom: 24px; right: 24px; background: #222; color: #eee; padding: 10px 20px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 300; }
+#toast.show { opacity: 1; }
+
+/* ── SCROLLBAR ── */
+.side::-webkit-scrollbar { width: 3px; }
+.side::-webkit-scrollbar-thumb { background: #2a2d3e; border-radius: 4px; }
+.main::-webkit-scrollbar { width: 4px; }
+.main::-webkit-scrollbar-thumb { background: #2a2d3e; border-radius: 4px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+    .btn-toggle { display: block; }
+    .side { display: none; position: fixed; top: 53px; left: 0; bottom: 0; z-index: 150; box-shadow: 4px 0 30px rgba(0,0,0,0.4); }
+    .side.open { display: block; }
+    .overlay { display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 140; }
+    .overlay.open { display: block; }
+    .main { padding: 14px; }
+    .metrics { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .metric { padding: 10px 12px; }
+    .metric .num { font-size: 18px; }
+    .ctrl { flex-direction: column; }
+    .ctrl input { min-width: auto; width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+    <button class="btn-toggle" onclick="tog()">☰</button>
+    <h1>Sales System</h1>
+    <span class="sub" id="topInfo"></span>
+</div>
+<div class="overlay" id="ov" onclick="tog()"></div>
+
+<div class="wrap">
+    <!-- SIDEBAR -->
+    <div class="side" id="side"></div>
+
+    <!-- MAIN -->
+    <div class="main" id="main"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+        <div class="modal-hdr">
+            <h2 id="mTitle"></h2>
+            <button class="close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="mBody"></div>
+        <div class="modal-ftr" id="mFooter"></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──
+let activeList = 'hot-leads';
+let searchQ = '', statusF = 'all', sortCol = 'id', sortDir = 1;
+let page = 0, perPage = 25;
+const STATUS = ['New', 'Called', 'Contacted', 'Interested', 'Not Interested', 'Follow Up', 'Closed Won', 'Closed Lost'];
+
+// ── PERSISTENCE ──
+let leadData = JSON.parse(localStorage.getItem('salesLeads') || '{}');
+function saveLeadState(id, field, val) {
+    if (!leadData[id]) leadData[id] = {};
+    leadData[id][field] = val;
+    leadData[id].updated = Date.now();
+    localStorage.setItem('salesLeads', JSON.stringify(leadData));
+}
+
+function getLeadsForList(key) {
+    return LEADS.filter(l => l.lists.includes(key));
+}
+
+// ── BUILD SIDEBAR ──
+function buildSide() {
+    const keys = Object.keys(PULL_LISTS);
+    let html = '<div class="side-grp">Pull Lists</div>';
+    keys.forEach((k, i) => {
+        const s = PULL_LISTS[k];
+        const st = LIST_STATS[k];
+        html += `<div class="side-item${k===activeList?' active':''}" onclick="switchList('${k}')">
+            <span>${s.name}</span>
+            <span class="badge">${st.count}</span>
+        </div>`;
+    });
+    document.getElementById('side').innerHTML = html;
+}
+
+// ── RENDER LIST ──
+function render() {
+    const leads = getLeadsForList(activeList);
+    const st = LIST_STATS[activeList];
+
+    // Filter
+    let filtered = leads.filter(l => {
+        if (statusF !== 'all' && l.ws !== statusF) return false;
+        if (searchQ && !l.name.toLowerCase().includes(searchQ) && !l.cat.toLowerCase().includes(searchQ) && !l.email.toLowerCase().includes(searchQ) && !l.phone.includes(searchQ)) return false;
+        return true;
+    });
+
+    // Sort
+    filtered.sort((a,b) => {
+        if (sortCol === 'id') return (a.id - b.id) * sortDir;
+        const va = (a[sortCol]||'').toString().toLowerCase(), vb = (b[sortCol]||'').toString().toLowerCase();
+        return va.localeCompare(vb) * sortDir;
+    });
+
+    const pages = Math.ceil(filtered.length / perPage);
+    if (page >= pages) page = Math.max(0, pages - 1);
+    const start = page * perPage, end = Math.min(start + perPage, filtered.length);
+    const pageData = filtered.slice(start, end);
+
+    // ── HEADER ──
+    const list = PULL_LISTS[activeList];
+    let h = `<div class="list-header">
+        <h2>${list.name}</h2>
+        <div class="desc">${list.desc}</div>
+        <div class="meta">
+            <span>Leads: <strong>${st.count}</strong></span>
+            <span>With Email: <strong>${st.withEmail}</strong></span>
+            <span>With Phone: <strong>${st.withPhone}</strong></span>
+            <span>Est. Portfolio: <strong>$${st.totalValue.toLocaleString()}</strong></span>
+            <span>Avg/Lead: <strong>$${st.avgValue.toLocaleString()}</strong></span>
+        </div>
+    </div>`;
+
+    // ── METRICS ──
+    const wsNone = filtered.filter(l => l.ws === 'none').length;
+    const wsWork = filtered.filter(l => l.ws === 'working').length;
+    const wsBroken = filtered.filter(l => l.ws === 'broken').length;
+    const called = Object.values(leadData).filter(d => d.status === 'Called' || d.status === 'Contacted' || d.status === 'Interested').length;
+    const won = Object.values(leadData).filter(d => d.status === 'Closed Won').length;
+
+    h += `<div class="metrics">
+        <div class="metric highlight"><div class="num">${filtered.length}</div><div class="lbl">Filtered Results</div></div>
+        <div class="metric"><div class="num">${wsNone}</div><div class="lbl">No Website</div></div>
+        <div class="metric"><div class="num">${wsWork}</div><div class="lbl">Working</div></div>
+        <div class="metric"><div class="num">${wsBroken}</div><div class="lbl">Not Working</div></div>
+        <div class="metric"><div class="num">${called}</div><div class="lbl">Called/Contacted</div></div>
+        <div class="metric"><div class="num" style="color:#66BB6A">${won}</div><div class="lbl">Closed Won</div></div>
+    </div>`;
+
+    // ── STATUS FILTERS ──
+    h += `<div class="status-fil">
+        <button class="stat-btn ${statusF==='all'?'on':''}" onclick="setStatFilter('all')">All <span class="b">${leads.length}</span></button>
+        <button class="stat-btn ${statusF==='none'?'on':''}" onclick="setStatFilter('none')">No Website <span class="b">${leads.filter(l=>l.ws==='none').length}</span></button>
+        <button class="stat-btn ${statusF==='working'?'on':''}" onclick="setStatFilter('working')">Working <span class="b">${leads.filter(l=>l.ws==='working').length}</span></button>
+        <button class="stat-btn ${statusF==='broken'?'on':''}" onclick="setStatFilter('broken')">Not Working <span class="b">${leads.filter(l=>l.ws==='broken').length}</span></button>
+    </div>`;
+
+    // ── CONTROLS ──
+    h += `<div class="ctrl">
+        <input type="text" placeholder="Search name, category, email, phone..." value="${searchQ}" oninput="setQ(this.value)">
+        <select onchange="setPP(parseInt(this.value))">
+            <option value="25" ${perPage===25?'selected':''}>25/page</option>
+            <option value="50" ${perPage===50?'selected':''}>50/page</option>
+            <option value="100" ${perPage===100?'selected':''}>100/page</option>
+        </select>
+        <span class="count">${filtered.length} results</span>
+    </div>`;
+
+    // ── TABLE ──
+    h += '<div class="tw"><table><thead><tr>';
+    const cols = [
+        { k: 'id', l: '#' }, { k: 'name', l: 'Business' }, { k: 'cat', l: 'Category' },
+        { k: null, l: 'Email' }, { k: null, l: 'Phone' }, { k: 'ws', l: 'Status' },
+        { k: null, l: 'Services' }, { k: null, l: 'Est. $' }, { k: null, l: 'Lead Status' }
+    ];
+    cols.forEach(c => {
+        if (c.k) h += `<th onclick="setSort('${c.k}')">${c.l} <span class="arr">${sortCol===c.k?(sortDir===1?'▲':'▼'):''}</span></th>`;
+        else h += `<th>${c.l}</th>`;
+    });
+    h += '</tr></thead><tbody>';
+
+    if (filtered.length === 0) {
+        h += `<tr><td colspan="9"><div class="empty"><h3>No leads match your filters</h3><p>Try changing search or status filter</p></div></td></tr>`;
+    } else {
+        pageData.forEach(l => {
+            const ld = leadData[l.id] || {};
+            const st = ld.status || 'New';
+            const svcCount = PULL_LISTS[activeList].name.includes('No Website') || PULL_LISTS[activeList].name.includes('Hot Leads') ? 6 : 6;
+            h += `<tr class="c" onclick="openModal(${l.id})">
+                <td style="color:#555">${l.id}</td>
+                <td><strong style="color:#eee">${l.name}</strong></td>
+                <td style="color:#888;font-size:12px">${l.cat}</td>
+                <td>${l.email ? `<a href="mailto:${l.email}" style="color:#4FC3F7;text-decoration:none;font-size:12px" onclick="event.stopPropagation()">${l.email}</a>` : ''}</td>
+                <td>${l.phone ? `<a href="tel:${l.phone}" style="color:#66BB6A;text-decoration:none;font-size:12px" onclick="event.stopPropagation()">${l.phone}</a>` : ''}</td>
+                <td><span class="tag ${l.ws}">${l.ws==='working'?'Working':l.ws==='broken'?'Not Working':'No Website'}</span></td>
+                <td class="svc">${l.services.split(', ').slice(0,3).join(', ')}${l.services.split(', ').length > 3 ? '...' : ''}</td>
+                <td style="color:#66BB6A;font-weight:600">$${l.totalValue}</td>
+                <td><select class="sel-st" onclick="event.stopPropagation()" onchange="updateStatus(${l.id}, this.value)">
+                    ${STATUS.map(s => `<option value="${s}" ${st===s?'selected':''}>${s}</option>`).join('')}
+                </select></td>
+            </tr>`;
+        });
+    }
+
+    h += '</tbody></table>';
+
+    // ── PAGINATION ──
+    let pg = '';
+    if (filtered.length > 0) {
+        pg += `<div class="pag">
+            <span>${start+1}-${end} of ${filtered.length}</span>
+            <div class="pages">
+                <button onclick="goP(0)" ${page===0?'disabled':''}>«</button>
+                <button onclick="goP(${page-1})" ${page===0?'disabled':''}>‹</button>`;
+        const maxV = 5, pStart = Math.max(0, page - Math.floor(maxV/2)), pEnd = Math.min(pages, pStart + maxV);
+        for (let i = pStart; i < pEnd; i++) pg += `<button class="${i===page?'on':''}" onclick="goP(${i})">${i+1}</button>`;
+        pg += `<button onclick="goP(${page+1})" ${page>=pages-1?'disabled':''}>›</button>
+                <button onclick="goP(${pages-1})" ${page>=pages-1?'disabled':''}>»</button>
+            </div>
+        </div>`;
+    }
+
+    h += pg + '</div>';
+    document.getElementById('main').innerHTML = h;
+    document.getElementById('topInfo').textContent = `Active: ${list.name}`;
+    document.title = `Sales System — ${list.name}`;
+
+    // Update sidebar active
+    document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
+    const idx = Object.keys(PULL_LISTS).indexOf(activeList);
+    if (idx >= 0) document.querySelectorAll('.side-item')[idx]?.classList.add('active');
+}
+
+// ── ACTIONS ──
+function switchList(key) { activeList = key; page = 0; searchQ = ''; statusF = 'all'; sortCol = 'id'; sortDir = 1; render(); if (window.innerWidth <= 860) tog(); }
+function setQ(v) { searchQ = v.toLowerCase(); page = 0; render(); }
+function setStatFilter(v) { statusF = v; page = 0; render(); }
+function setSort(col) { if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; } render(); }
+function goP(p) { page = p; render(); document.querySelector('.tw').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function setPP(v) { perPage = v; page = 0; render(); }
+function tog() { document.getElementById('side').classList.toggle('open'); document.getElementById('ov').classList.toggle('open'); }
+
+// ── MODAL ──
+function openModal(id) {
+    const l = LEADS.find(x => x.id === id);
+    if (!l) return;
+    const ld = leadData[id] || {};
+    document.getElementById('mTitle').textContent = l.name;
+    document.getElementById('mBody').innerHTML = `
+        <div class="rw"><div class="l">Category</div><div class="v">${l.cat}</div></div>
+        <div class="rw"><div class="l">Email</div><div class="v">${l.email || '—'}</div></div>
+        <div class="rw"><div class="l">Phone</div><div class="v">${l.phone || '—'}</div></div>
+        <div class="rw"><div class="l">Website</div><div class="v">${l.website ? `<a href="${l.website}" target="_blank" style="color:#4FC3F7">${l.website}</a>` : '<span style="color:#ef5350;font-weight:600">No website</span>'}</div></div>
+        <div class="rw"><div class="l">Status</div><div class="v"><span class="tag ${l.ws}">${l.ws==='working'?'Working':l.ws==='broken'?'Not Working':'No Website'}</span></div></div>
+        <div class="rw"><div class="l">Address</div><div class="v">${l.address || '—'}</div></div>
+        <div class="rw"><div class="l">Services</div><div class="v">${l.services}</div></div>
+        <div class="rw"><div class="l">Est. Value</div><div class="v" style="color:#66BB6A;font-weight:600">$${l.totalValue}</div></div>
+        <div class="rw"><div class="l">Lead Status</div><div class="v"><select class="sel-st" onchange="updateStatus(${l.id}, this.value)">
+            ${STATUS.map(s => `<option value="${s}" ${(ld.status||'New')===s?'selected':''}>${s}</option>`).join('')}
+        </select></div></div>
+        <div class="note-area">
+            <textarea placeholder="Add notes about this lead..." onchange="addNote(${l.id}, this.value)">${ld.notes || ''}</textarea>
+        </div>
+    `;
+    document.getElementById('mFooter').innerHTML = `
+        ${l.phone ? `<button class="call-btn" onclick="doCall(${l.id},'${l.phone}')">📞 Call</button>` : ''}
+        ${l.email ? `<button class="email-btn" onclick="doEmail(${l.id},'${l.email}')">✉ Email</button>` : ''}
+        <button class="save-btn" onclick="saveLead(${l.id})">⭐ Save</button>
+    `;
+    document.getElementById('modal').dataset.id = id;
+    document.getElementById('modal').classList.add('on');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('on'); }
+
+function updateStatus(id, val) {
+    saveLeadState(id, 'status', val);
+    render();
+    showToast('Status: ' + val);
+}
+
+function addNote(id, val) {
+    saveLeadState(id, 'notes', val);
+    showToast('Note saved');
+}
+
+function doCall(id, phone) {
+    window.open('tel:' + phone);
+    saveLeadState(id, 'status', 'Called');
+    saveLeadState(id, 'calledAt', new Date().toISOString());
+    render();
+    showToast('📞 Call logged');
+}
+
+function doEmail(id, email) {
+    window.open('mailto:' + email);
+    saveLeadState(id, 'status', 'Contacted');
+    saveLeadState(id, 'contactedAt', new Date().toISOString());
+    render();
+    showToast('✉ Email logged');
+}
+
+function saveLead(id) {
+    const ld = leadData[id] || {};
+    if (!ld.saved) {
+        saveLeadState(id, 'saved', true);
+        showToast('⭐ Lead saved');
+    } else {
+        showToast('Already saved');
+    }
+}
+
+// ── TOAST ──
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.ctrlKey && e.key === 'f') { e.preventDefault(); const inp = document.querySelector('.ctrl input'); if (inp) inp.focus(); }
+});
+
+// ── INIT ──
+buildSide();
+render();
+</script>
+</body>
+</html>

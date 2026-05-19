@@ -1,0 +1,13 @@
+const fs = require('fs');
+const content = fs.readFileSync('crm-data.js', 'utf8');
+const data = JSON.parse(content.substring(content.indexOf('['), content.indexOf('];') + 1));
+const cats = {};
+data.forEach(b => { cats[b.cat] = (cats[b.cat] || 0) + 1; });
+const top = Object.entries(cats).sort((a,b) => b[1]-a[1]).slice(0, 10);
+console.log('Total:', data.length);
+console.log('With website:', data.filter(b => b.website).length);
+console.log('With phone:', data.filter(b => b.phone).length);
+console.log('Hot leads:', data.filter(b => b.needsWebsite && b.phone).length);
+console.log('No website no phone:', data.filter(b => b.needsWebsite && !b.phone).length);
+console.log('Top cats:', top);
+console.log('Sample:', JSON.stringify(data[0], null, 2));

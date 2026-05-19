@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kigali Business Dashboard</title>
+<script src="dashboard-data.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #333; }
+.top-bar { background: linear-gradient(135deg, #0D47A1, #1565C0); color: white; padding: 16px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.top-bar h1 { font-size: 18px; white-space: nowrap; }
+.top-bar .sub { font-size: 12px; opacity: 0.7; }
+.menu-toggle { display: none; background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 4px; }
+.container { display: flex; min-height: calc(100vh - 60px); }
+
+/* ===== SIDEBAR ===== */
+.sidebar { width: 240px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; flex-shrink: 0; padding: 0; }
+.sidebar-section { padding: 16px 16px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #999; }
+.sidebar-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; cursor: pointer; font-size: 13px; color: #444; transition: all 0.15s; border-left: 3px solid transparent; }
+.sidebar-item:hover { background: #E3F2FD; }
+.sidebar-item.active { background: #E3F2FD; border-left-color: #1565C0; font-weight: 600; color: #0D47A1; }
+.sidebar-item .badge { background: #e0e0e0; color: #666; font-size: 11px; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
+.sidebar-item.active .badge { background: #1565C0; color: white; }
+.sidebar-item .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.dot.red { background: #C62828; }
+.dot.green { background: #2E7D32; }
+.dot.orange { background: #E65100; }
+.dot.blue { background: #1565C0; }
+
+/* ===== A-Z NAV ===== */
+.az-nav { display: flex; flex-wrap: wrap; padding: 8px 12px; gap: 2px; border-bottom: 1px solid #e0e0e0; }
+.az-nav .letter { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 4px; color: #999; }
+.az-nav .letter.has { color: #1565C0; background: #E3F2FD; }
+.az-nav .letter.has:hover { background: #1565C0; color: white; }
+.az-nav .letter.all { color: #333; font-size: 10px; width: auto; padding: 0 6px; }
+
+/* ===== MAIN CONTENT ===== */
+.main { flex: 1; padding: 16px 20px; overflow: auto; min-width: 0; }
+
+/* Stats row */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.stat-card { background: white; padding: 14px 18px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.15s; border: 2px solid transparent; }
+.stat-card:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+.stat-card.active { border-color: #1565C0; }
+.stat-card .num { font-size: 24px; font-weight: 700; }
+.stat-card .lbl { font-size: 11px; color: #666; margin-top: 1px; }
+.stat-card.blue .num { color: #1565C0; }
+.stat-card.red .num { color: #C62828; }
+.stat-card.green .num { color: #2E7D32; }
+.stat-card.orange .num { color: #E65100; }
+.stat-card.purple .num { color: #6A1B9A; }
+
+/* Controls bar */
+.controls { background: white; padding: 10px 16px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.controls input { flex: 1; min-width: 180px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; transition: border 0.2s; }
+.controls input:focus { border-color: #1565C0; box-shadow: 0 0 0 3px rgba(21,101,192,0.1); }
+.controls select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; }
+.controls .result-count { font-size: 12px; color: #999; white-space: nowrap; }
+
+/* Status filter buttons */
+.status-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.status-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+.status-btn:hover { background: #f5f5f5; }
+.status-btn.active { color: white; border-color: transparent; }
+.status-btn.active.all { background: #1565C0; }
+.status-btn.active.none { background: #C62828; }
+.status-btn.active.working { background: #2E7D32; }
+.status-btn.active.broken { background: #E65100; }
+.status-btn .badge { background: #eee; padding: 1px 6px; border-radius: 8px; font-size: 10px; margin-left: 4px; }
+.status-btn.active .badge { background: rgba(255,255,255,0.25); color: white; }
+
+/* Table */
+.table-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8f9fa; padding: 10px 13px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #666; cursor: pointer; user-select: none; white-space: nowrap; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 2; }
+th:hover { color: #1565C0; }
+th .arrow { margin-left: 3px; font-size: 10px; }
+td { padding: 9px 13px; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #E3F2FD; }
+tr.clickable { cursor: pointer; }
+
+.status-tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.status-tag.working { background: #E8F5E9; color: #2E7D32; }
+.status-tag.broken { background: #FFF3E0; color: #E65100; }
+.status-tag.none { background: #FFEBEE; color: #C62828; }
+
+.email-link { color: #1565C0; text-decoration: none; font-size: 12px; }
+.email-link:hover { text-decoration: underline; }
+.phone-link { color: #2E7D32; text-decoration: none; font-weight: 500; }
+.web-link { color: #1565C0; text-decoration: none; font-size: 12px; word-break: break-all; }
+.web-link:hover { text-decoration: underline; }
+
+/* Pagination */
+.pagination { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8f9fa; border-top: 1px solid #e0e0e0; font-size: 13px; }
+.pagination .info { color: #666; }
+.pagination .pages { display: flex; gap: 4px; }
+.pagination .pages button { min-width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+.pagination .pages button:hover { background: #E3F2FD; border-color: #1565C0; }
+.pagination .pages button.active { background: #1565C0; color: white; border-color: #1565C0; }
+.pagination .pages button:disabled { opacity: 0.3; cursor: default; }
+
+/* ===== MODAL ===== */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 14px; width: 520px; max-width: 90vw; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: slideUp 0.2s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-header h2 { font-size: 18px; color: #0D47A1; }
+.modal-header .close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0 4px; }
+.modal-header .close:hover { color: #333; }
+.modal-body { padding: 20px 24px; }
+.modal-body .row { display: flex; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.modal-body .row:last-child { border: none; }
+.modal-body .label { width: 120px; font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+.modal-body .value { font-size: 14px; color: #333; word-break: break-word; }
+.modal-footer { padding: 14px 24px; border-top: 1px solid #eee; display: flex; gap: 8px; }
+.modal-footer button { padding: 8px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; }
+.modal-footer .call { background: #2E7D32; color: white; }
+.modal-footer .call:hover { background: #1B5E20; }
+.modal-footer .email { background: #1565C0; color: white; }
+.modal-footer .email:hover { background: #0D47A1; }
+.modal-footer .save { background: #E65100; color: white; }
+.modal-footer .save:hover { background: #BF360C; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+.empty-state h3 { color: #666; margin-bottom: 6px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .menu-toggle { display: block; }
+    .sidebar { display: none; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 150; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+    .sidebar.open { display: block; }
+    .overlay { display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 140; }
+    .overlay.open { display: block; }
+    .top-bar h1 { font-size: 15px; }
+    .stats-row { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .stat-card { padding: 10px 14px; }
+    .stat-card .num { font-size: 20px; }
+    .controls { flex-direction: column; }
+    .controls input { min-width: auto; width: 100%; }
+    .modal { width: 95vw; }
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <h1>Kigali Business Directory</h1>
+    <span class="sub" id="headerCount"></span>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="container">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-section">Quick Links</div>
+        <div class="sidebar-item active" data-filter="all" onclick="setQuickFilter('all', this)">
+            <span>📋 All Businesses</span>
+            <span class="badge" id="badge-all"></span>
+        </div>
+        <div class="sidebar-item" data-filter="none" onclick="setQuickFilter('none', this)">
+            <span><span class="dot red"></span>No Website</span>
+            <span class="badge" id="badge-none"></span>
+        </div>
+        <div class="sidebar-item" data-filter="working" onclick="setQuickFilter('working', this)">
+            <span><span class="dot green"></span>Working</span>
+            <span class="badge" id="badge-working"></span>
+        </div>
+        <div class="sidebar-item" data-filter="broken" onclick="setQuickFilter('broken', this)">
+            <span><span class="dot orange"></span>Not Working</span>
+            <span class="badge" id="badge-broken"></span>
+        </div>
+        <div class="sidebar-item" data-filter="hasContact" onclick="setQuickFilter('hasContact', this)">
+            <span><span class="dot blue"></span>Has Email/Phone</span>
+            <span class="badge" id="badge-contact"></span>
+        </div>
+
+        <div class="sidebar-section">A-Z Navigation</div>
+        <div class="az-nav" id="azNav"></div>
+
+        <div class="sidebar-section">Categories</div>
+        <div id="catList"></div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="stats-row" id="statsRow"></div>
+
+        <div class="status-filters" id="statusFilters"></div>
+
+        <div class="controls">
+            <input type="text" id="search" placeholder="Search business name, category, email, phone..." oninput="onSearch()">
+            <select id="catSelect" onchange="onFilterChange()"><option value="">All Categories</option></select>
+            <select id="perPage" onchange="onFilterChange()">
+                <option value="25">25 / page</option>
+                <option value="50" selected>50 / page</option>
+                <option value="100">100 / page</option>
+                <option value="250">250 / page</option>
+            </select>
+            <span class="result-count" id="resultCount"></span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th onclick="sort('id')" style="width:40px"># <span class="arrow" id="a-id">▼</span></th>
+                        <th onclick="sort('name')">Business <span class="arrow" id="a-name"></span></th>
+                        <th onclick="sort('cat')">Category <span class="arrow" id="a-cat"></span></th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th onclick="sort('ws')" style="width:140px">Website <span class="arrow" id="a-ws"></span></th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+            <div class="pagination">
+                <span class="info" id="pageInfo"></span>
+                <div class="pages" id="pageBtns"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modalTitle"></h2>
+            <button class="close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <button class="call" id="modalCall" onclick="doCall()">📞 Call</button>
+            <button class="email" id="modalEmail" onclick="doEmail()">✉ Email</button>
+            <button class="save" onclick="saveLead()">⭐ Save Lead</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let allData = DATA;
+let filtered = [...allData];
+let sortCol = 'id', sortDir = 1;
+let page = 0, perPage = 50;
+let quickFilter = 'all';
+let savedLeads = JSON.parse(localStorage.getItem('savedLeads') || '[]');
+
+// ===== INIT =====
+function init() {
+    const cats = [...new Set(allData.map(d => d.cat))].sort();
+    
+    // Stats
+    const none = allData.filter(d => d.ws === 'none').length;
+    const working = allData.filter(d => d.ws === 'working').length;
+    const broken = allData.filter(d => d.ws === 'broken').length;
+    const contact = allData.filter(d => d.email || d.phone).length;
+
+    document.getElementById('headerCount').textContent = `${allData.length} businesses`;
+
+    document.getElementById('badge-all').textContent = allData.length;
+    document.getElementById('badge-none').textContent = none;
+    document.getElementById('badge-working').textContent = working;
+    document.getElementById('badge-broken').textContent = broken;
+    document.getElementById('badge-contact').textContent = contact;
+
+    document.getElementById('statsRow').innerHTML = `
+        <div class="stat-card blue active" data-stat="all" onclick="setStatFilter('all', this)"><div class="num">${allData.length.toLocaleString()}</div><div class="lbl">Total Businesses</div></div>
+        <div class="stat-card red" data-stat="none" onclick="setStatFilter('none', this)"><div class="num">${none.toLocaleString()}</div><div class="lbl">No Website</div></div>
+        <div class="stat-card green" data-stat="working" onclick="setStatFilter('working', this)"><div class="num">${working.toLocaleString()}</div><div class="lbl">Working Websites</div></div>
+        <div class="stat-card orange" data-stat="broken" onclick="setStatFilter('broken', this)"><div class="num">${broken.toLocaleString()}</div><div class="lbl">Not Working</div></div>
+        <div class="stat-card purple" data-stat="contact" onclick="setStatFilter('contact', this)"><div class="num">${contact.toLocaleString()}</div><div class="lbl">Has Email/Phone</div></div>
+    `;
+
+    // Status filter buttons
+    document.getElementById('statusFilters').innerHTML = `
+        <button class="status-btn active all" data-st="all" onclick="setStatusFilter('all', this)">All <span class="badge">${allData.length}</span></button>
+        <button class="status-btn none" data-st="none" onclick="setStatusFilter('none', this)">No Website <span class="badge">${none}</span></button>
+        <button class="status-btn working" data-st="working" onclick="setStatusFilter('working', this)">Working <span class="badge">${working}</span></button>
+        <button class="status-btn broken" data-st="broken" onclick="setStatusFilter('broken', this)">Not Working <span class="badge">${broken}</span></button>
+    `;
+
+    // Category dropdown
+    document.getElementById('catSelect').innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    // Category sidebar
+    const catList = document.getElementById('catList');
+    const catCounts = {};
+    allData.forEach(d => catCounts[d.cat] = (catCounts[d.cat] || 0) + 1);
+    cats.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'sidebar-item';
+        div.dataset.cat = c;
+        div.innerHTML = `${c} <span class="badge">${catCounts[c]}</span>`;
+        div.onclick = () => setCategoryFilter(c, div);
+        catList.appendChild(div);
+    });
+
+    // A-Z nav
+    const az = document.getElementById('azNav');
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    az.innerHTML = '<span class="letter all has" onclick="setLetter(\'\', this)">ALL</span>';
+    const nameFirst = [...new Set(allData.map(d => (d.name[0] || '').toUpperCase()))];
+    letters.forEach(l => {
+        const has = nameFirst.includes(l);
+        az.innerHTML += `<span class="letter ${has ? 'has' : ''}" onclick="setLetter('${l}', this)">${l}</span>`;
+    });
+
+    render();
+}
+
+// ===== RENDER =====
+function render() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const catVal = document.getElementById('catSelect').value;
+    const st = document.getElementById('statusFilters').querySelector('.active')?.dataset?.st || 'all';
+    const letter = document.getElementById('azNav').querySelector('.active')?.textContent || '';
+    const catSide = document.getElementById('catList').querySelector('.active')?.dataset?.cat || '';
+
+    filtered = allData.filter(d => {
+        if (st !== 'all' && d.ws !== st) return false;
+        if (catVal && d.cat !== catVal) return false;
+        if (catSide && d.cat !== catSide) return false;
+        if (letter && letter !== 'ALL' && (d.name[0] || '').toUpperCase() !== letter) return false;
+        if (quickFilter === 'hasContact' && !d.email && !d.phone) return false;
+        if (q && !d.name.toLowerCase().includes(q) && !d.cat.toLowerCase().includes(q) && !d.email.toLowerCase().includes(q) && !d.phone.includes(q)) return false;
+        return true;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+        let va = (a[sortCol] || '').toString().toLowerCase();
+        let vb = (b[sortCol] || '').toString().toLowerCase();
+        if (sortCol === 'id') return (a.id - b.id) * sortDir;
+        return va.localeCompare(vb) * sortDir;
+    });
+
+    page = 0;
+    renderPage();
+}
+
+function renderPage() {
+    const start = page * perPage;
+    const end = start + perPage;
+    const pageData = filtered.slice(start, end);
+    const tbody = document.getElementById('tbody');
+    const pages = Math.ceil(filtered.length / perPage);
+
+    document.getElementById('resultCount').textContent = `${filtered.length} results`;
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><h3>No businesses found</h3><p>Try changing your search or filters</p></div></td></tr>`;
+    } else {
+        tbody.innerHTML = pageData.map(d => `
+            <tr class="clickable" onclick="openModal(${d.id})">
+                <td>${d.id}</td>
+                <td><strong>${d.name}</strong>${savedLeads.includes(d.id) ? ' ⭐' : ''}</td>
+                <td>${d.cat}</td>
+                <td>${d.email ? `<a href="mailto:${d.email}" class="email-link" onclick="event.stopPropagation()">${d.email}</a>` : ''}</td>
+                <td>${d.phone ? `<a href="tel:${d.phone}" class="phone-link" onclick="event.stopPropagation()">${d.phone}</a>` : ''}</td>
+                <td><span class="status-tag ${d.ws}">${d.ws === 'working' ? 'Working' : d.ws === 'broken' ? 'Not Working' : 'No Website'}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    // Pagination
+    const info = document.getElementById('pageInfo');
+    if (filtered.length > 0) info.textContent = `${start+1}-${Math.min(end, filtered.length)} of ${filtered.length}`;
+    else info.textContent = '0 results';
+
+    let btns = '';
+    const maxVisible = 5;
+    let pStart = Math.max(0, page - Math.floor(maxVisible / 2));
+    let pEnd = Math.min(pages, pStart + maxVisible);
+    if (pEnd - pStart < maxVisible) pStart = Math.max(0, pEnd - maxVisible);
+
+    if (page > 0) btns += `<button onclick="goPage(0)">«</button>`;
+    btns += `<button onclick="goPage(${page-1})" ${page===0?'disabled':''}>‹</button>`;
+    for (let i = pStart; i < pEnd; i++) btns += `<button class="${i===page?'active':''}" onclick="goPage(${i})">${i+1}</button>`;
+    btns += `<button onclick="goPage(${page+1})" ${page>=pages-1?'disabled':''}>›</button>`;
+    if (page < pages - 1) btns += `<button onclick="goPage(${pages-1})">»</button>`;
+    document.getElementById('pageBtns').innerHTML = btns;
+}
+
+function goPage(p) { page = p; renderPage(); document.querySelector('.table-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+// ===== FILTERS =====
+function onSearch() { render(); }
+function onFilterChange() { perPage = parseInt(document.getElementById('perPage').value); render(); }
+
+function setStatusFilter(val, btn) {
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Clear sidebar & dropdown
+    document.getElementById('catList').querySelectorAll('.active').forEach(e => e.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item[data-filter]').forEach(e => e.classList.remove('active'));
+    document.getElementById('catSelect').value = '';
+    quickFilter = 'all';
+    // Clear stat cards
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    render();
+}
+
+function setQuickFilter(val, el) {
+    document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+    quickFilter = val;
+    document.getElementById('catSelect').value = '';
+    document.getElementById('catList').querySelectorAll('.active').forEach(e => e.classList.remove('active'));
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.status-btn.all').classList.add('active');
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    if (val === 'none') document.querySelector('.stat-card[data-stat="none"]')?.classList.add('active');
+    if (val === 'working') document.querySelector('.stat-card[data-stat="working"]')?.classList.add('active');
+    if (val === 'broken') document.querySelector('.stat-card[data-stat="broken"]')?.classList.add('active');
+    if (val === 'hasContact') document.querySelector('.stat-card[data-stat="contact"]')?.classList.add('active');
+    if (val === 'all') document.querySelector('.stat-card[data-stat="all"]')?.classList.add('active');
+    render();
+}
+
+function setStatFilter(val, el) {
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+    document.getElementById('catSelect').value = '';
+    quickFilter = val;
+    if (val === 'all') document.querySelector('.status-btn.all')?.classList.add('active');
+    else if (val === 'none') document.querySelector('.status-btn.none')?.classList.add('active');
+    else if (val === 'working') document.querySelector('.status-btn.working')?.classList.add('active');
+    else if (val === 'broken') document.querySelector('.status-btn.broken')?.classList.add('active');
+    // else hasContact stays without status filter
+    render();
+}
+
+function setCategoryFilter(cat, el) {
+    document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('catSelect').value = cat;
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.status-btn.all').classList.add('active');
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    quickFilter = 'all';
+    render();
+}
+
+function setLetter(letter, el) {
+    document.querySelectorAll('#azNav .letter').forEach(l => l.classList.remove('active'));
+    if (el) el.classList.add('active');
+    render();
+}
+
+// ===== SORT =====
+function sort(col) {
+    if (sortCol === col) sortDir *= -1;
+    else { sortCol = col; sortDir = 1; }
+    document.querySelectorAll('.arrow').forEach(a => a.textContent = '');
+    document.getElementById('a-' + col).textContent = sortDir === 1 ? '▲' : '▼';
+    render();
+}
+
+// ===== MODAL =====
+function openModal(id) {
+    const d = allData.find(x => x.id === id);
+    if (!d) return;
+    const saved = savedLeads.includes(id);
+    document.getElementById('modalTitle').textContent = d.name;
+    document.getElementById('modalBody').innerHTML = `
+        <div class="row"><div class="label">Category</div><div class="value">${d.cat}</div></div>
+        <div class="row"><div class="label">Email</div><div class="value">${d.email || '—'}</div></div>
+        <div class="row"><div class="label">Phone</div><div class="value">${d.phone || '—'}</div></div>
+        <div class="row"><div class="label">Website</div><div class="value">${d.website ? `<a href="${d.website}" target="_blank">${d.website}</a>` : '<span style="color:#C62828;font-weight:600">No website</span>'}</div></div>
+        <div class="row"><div class="label">Website Status</div><div class="value"><span class="status-tag ${d.ws}">${d.ws === 'working' ? 'Working' : d.ws === 'broken' ? 'Not Working' : 'No Website'}</span></div></div>
+        <div class="row"><div class="label">Address</div><div class="value">${d.address || '—'}</div></div>
+        <div class="row"><div class="label">Saved Lead</div><div class="value">${saved ? '⭐ Yes' : '—'}</div></div>
+    `;
+    document.getElementById('modalCall').style.display = d.phone ? 'inline-block' : 'none';
+    document.getElementById('modalEmail').style.display = d.email ? 'inline-block' : 'none';
+    document.getElementById('modalCall').onclick = () => { window.open('tel:' + d.phone); saveLead(); };
+    document.getElementById('modalEmail').onclick = () => { window.open('mailto:' + d.email); saveLead(); };
+    document.getElementById('modal').dataset.id = id;
+    document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function saveLead() {
+    const id = parseInt(document.getElementById('modal').dataset.id);
+    if (!savedLeads.includes(id)) { savedLeads.push(id); localStorage.setItem('savedLeads', JSON.stringify(savedLeads)); showToast('⭐ Lead saved!'); }
+    render();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+    let t = document.getElementById('toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#333;color:white;padding:12px 24px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none;'; document.body.appendChild(t); }
+    t.textContent = msg;
+    t.style.opacity = '1';
+    setTimeout(() => t.style.opacity = '0', 2000);
+}
+
+// ===== TOGGLE SIDEBAR (mobile) =====
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('search').focus(); }
+});
+
+init();
+</script>
+</body>
+</html>
