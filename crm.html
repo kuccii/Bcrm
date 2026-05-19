@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>CRM — Kigali Business Directory</title>
 <script src="crm-data.js"></script>
 <style>
@@ -100,12 +102,95 @@ tr.sel td{background:#f0eeff}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#d0d4e0;border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:#b0b8c8}
-@media(max-width:768px){.side{display:none}.top{flex-direction:column;align-items:stretch}.top input{max-width:none}.cx{padding:12px}}
+/* ─── MOBILE APP-LIKE RESPONSIVE ─── */
+@media(max-width:768px){
+  body{overflow:auto;background:#f4f6fb}
+  .side{position:fixed;top:0;left:-280px;width:260px;height:100vh;z-index:500;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 30px rgba(0,0,0,.15)}
+  .side.open{left:0}
+  .side-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:499;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .side-backdrop.open{display:block}
+  .main{width:100%;padding-bottom:64px;min-height:100vh}
+  .top{position:sticky;top:0;z-index:100;background:#fff;padding:8px 12px;display:grid;grid-template-columns:1fr auto;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .top input{grid-column:1/-1;min-width:0;max-width:none;font-size:16px;padding:10px 14px}
+  .top select{font-size:16px;padding:10px 12px;max-width:none;width:100%}
+  .top .inf{grid-column:1/-1;font-size:12px;text-align:center}
+  .tbar{display:flex;gap:4px}
+  .tbar button{padding:10px 14px;font-size:13px;min-height:44px}
+  .ham{display:flex!important;align-items:center;justify-content:center;width:44px;height:44px;border:none;background:#f4f6fb;border-radius:10px;cursor:pointer;font-size:20px;color:#1a1a2e;flex-shrink:0;order:-1}
+  .ham:active{background:#e8ebf2}
+  .cx{padding:12px!important;overflow:visible!important}
+  .sr{grid-template-columns:repeat(2,1fr);gap:8px}
+  .sc{padding:12px;border-radius:12px}
+  .sc .n{font-size:20px}
+  .fb{gap:4px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .fb button{flex-shrink:0;font-size:12px;padding:8px 14px;min-height:36px}
+  .tb{border-radius:12px;overflow:hidden;margin:0 -4px}
+  table{font-size:12px}
+  th{padding:8px 10px;font-size:10px}
+  td{padding:8px 10px;font-size:12px}
+  .mo{align-items:flex-end}
+  .mo.on{display:flex}
+  .m{width:100%;max-width:100vw;max-height:92vh;border-radius:16px 16px 0 0;margin-top:auto;animation:slideUp .3s}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .mh{padding:14px 18px 10px}
+  .mh h2{font-size:15px}
+  .mb{padding:10px 18px}
+  .mb .rw{padding:6px 0}
+  .mb .lbl{width:70px;font-size:10px}
+  .mb .val{font-size:13px}
+  .mf{padding:10px 18px 14px}
+  .mf button{padding:12px 18px;font-size:14px;min-height:44px;flex:1}
+  .pg{flex-direction:column;gap:8px;padding:10px}
+  .pg .pb{width:100%;justify-content:center}
+  .pg .pb button{min-width:36px;height:36px}
+  #toast{bottom:80px;right:12px;left:12px;text-align:center;font-size:13px;padding:12px 16px}
+  .bbar{padding:8px 12px;flex-wrap:wrap;border-radius:12px;margin:0 -4px 10px}
+  .bbar select{flex:1;min-width:0}
+  .bbar button{min-height:36px}
+  .sts{font-size:16px;padding:8px 12px}
+  table tr{cursor:pointer}
+  /* bottom tab bar */
+  .btm-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1px solid #e8ebf2;display:flex;padding:4px 0 env(safe-area-inset-bottom,0);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  .btm-nav .bnv{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px 2px;cursor:pointer;font-size:10px;color:#8888aa;border:none;background:none;gap:1px;min-height:48px;-webkit-tap-highlight-color:transparent}
+  .btm-nav .bnv .ic{font-size:18px;line-height:1.2}
+  .btm-nav .bnv.on{color:#6c63ff}
+  .btm-nav .bnv:active{background:#f4f6fb;border-radius:8px}
+  ::-webkit-scrollbar{width:3px}
+  /* table -> stacked cards for very small screens */
+  @media(max-width:480px){
+    .cx{padding:8px!important}
+    .sr{gap:6px}
+    .top{padding:6px 8px}
+    .top input{font-size:16px;padding:10px 12px}
+    .sc{padding:10px}
+    .sc .n{font-size:18px}
+    /* existing table rows become cards */
+    .tb table,.tb thead,.tb tbody,.tb th,.tb td,.tb tr{display:block}
+    .tb thead{display:none}
+    .tb tr{display:flex;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid #eef0f6;gap:4px 8px;align-items:center}
+    .tb tr:last-child{border:none}
+    .tb td{border:none;padding:0;font-size:13px}
+    .tb td:first-child{display:none}
+    .tb td:nth-child(2){width:100%;font-size:15px!important;margin-bottom:2px}
+    .tb td:nth-child(2) strong{font-size:15px!important}
+    .tb td:nth-child(3){color:#8888aa;font-size:12px}
+    .tb td:nth-child(4){width:100%;font-size:13px;margin:2px 0}
+    .tb td:nth-child(5){font-size:13px}
+    .tb td:nth-child(6){margin-left:auto}
+    .tb td:nth-child(7){width:100%;margin-top:4px}
+    .tb td:nth-child(7) button{width:100%;padding:10px!important;font-size:14px!important;border-radius:8px!important}
+    .btm-nav .bnv{font-size:9px;padding:3px 1px}
+    .btm-nav .bnv .ic{font-size:16px}
+  }
+}
+@media(min-width:769px){
+  .ham,.btm-nav,.side-backdrop{display:none}
+}
 </style>
 </head>
 <body>
 
-<div class="side">
+<div class="side" id="side">
   <div class="side-h"><h1>CRM</h1><span>2,750 Kigali Businesses</span>
   <div style="margin-top:8px;padding:6px 10px;background:#222248;border-radius:6px;font-size:11px;color:#ccccee;line-height:1.4">
     <strong style="color:#fff">How to use:</strong><br>
@@ -123,8 +208,10 @@ tr.sel td{background:#f0eeff}
   </div>
 </div>
 
+<div class="side-backdrop" id="sideBackdrop" onclick="toggleSide()"></div>
 <div class="main">
   <div class="top">
+    <button class="ham" onclick="toggleSide()" aria-label="Menu">&#9776;</button>
     <input type="text" id="q" placeholder="Search name, category, email, phone, address..." oninput="doSearch()">
     <select id="catSel" onchange="doSearch()"><option value="">All Categories</option></select>
     <select id="pp" onchange="doSearch()"><option value="25">25</option><option value="50" selected>50</option><option value="100">100</option></select>
@@ -146,6 +233,8 @@ tr.sel td{background:#f0eeff}
 </div>
 <div id="toast"></div>
 
+<div class="btm-nav" id="btmNav"></div>
+
 <script>
 // ═══════════════════════════════════════
 // STATE
@@ -157,6 +246,8 @@ let sel = new Set();
 
 // ─── Helper: HTML-escape a string for use in onclick or text ───
 function esc(v) { return (v || '').toString().replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+function toggleSide() { document.getElementById('side').classList.toggle('open'); document.getElementById('sideBackdrop').classList.toggle('open'); }
+function closeSide() { document.getElementById('side').classList.remove('open'); document.getElementById('sideBackdrop').classList.remove('open'); }
 // ─── Helper: encode for localStorage key (remove special chars) ───
 function key(v) { return v.replace(/[&\/\\'",.<>]/g,'').replace(/\s+/g,'_'); }
 
@@ -187,11 +278,20 @@ function buildNav() {
     {i:'📂',n:'Categories',k:'cats'},{i:'📈',n:'Pipeline',k:'pipe'},
     {i:'📉',n:'Reports',k:'reports'}
   ];
+  // Sidebar nav
   document.getElementById('nav').innerHTML = items.map(x =>
     `<div class="nv ${tab===x.k?'on':''}" data-tab="${x.k}"><span class="ic">${x.i}</span>${x.n}</div>`
   ).join('');
-  // Attach click via data attribute to avoid escaping issues
   document.querySelectorAll('.nv[data-tab]').forEach(el => {
+    el.onclick = () => { goTab(el.dataset.tab); closeSide(); };
+  });
+  // Bottom nav
+  // Show only first 5 items on bottom for space
+  var btmItems = items.slice(0,5);
+  document.getElementById('btmNav').innerHTML = btmItems.map(x =>
+    `<div class="bnv ${tab===x.k?'on':''}" data-tab="${x.k}"><span class="ic">${x.i}</span>${x.n}</div>`
+  ).join('');
+  document.querySelectorAll('.btm-nav .bnv').forEach(el => {
     el.onclick = () => goTab(el.dataset.tab);
   });
   // Build category dropdown once
