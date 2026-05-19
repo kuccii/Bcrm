@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "crm.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "dashboard.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "sales-system.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "verification-dashboard.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/crm.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/sales", "dest": "/sales-system.html" },
+    { "src": "/verification", "dest": "/verification-dashboard.html" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
