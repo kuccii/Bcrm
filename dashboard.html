@@ -194,8 +194,6 @@ tr.clickable { cursor: pointer; }
     <div class="main">
         <div class="stats-row" id="statsRow"></div>
 
-        <div class="status-filters" id="statusFilters"></div>
-
         <div class="controls">
             <input type="text" id="search" placeholder="Search business name, category, email, phone..." oninput="onSearch()">
             <select id="catSelect" onchange="onFilterChange()"><option value="">All Categories</option></select>
@@ -280,14 +278,6 @@ function init() {
         <div class="stat-card purple" data-stat="contact" onclick="setStatFilter('contact', this)"><div class="num">${contact.toLocaleString()}</div><div class="lbl">Has Email/Phone</div></div>
     `;
 
-    // Status filter buttons
-    document.getElementById('statusFilters').innerHTML = `
-        <button class="status-btn active all" data-st="all" onclick="setStatusFilter('all', this)">All <span class="badge">${allData.length}</span></button>
-        <button class="status-btn none" data-st="none" onclick="setStatusFilter('none', this)">No Website <span class="badge">${none}</span></button>
-        <button class="status-btn working" data-st="working" onclick="setStatusFilter('working', this)">Working <span class="badge">${working}</span></button>
-        <button class="status-btn broken" data-st="broken" onclick="setStatusFilter('broken', this)">Not Working <span class="badge">${broken}</span></button>
-    `;
-
     // Category dropdown
     document.getElementById('catSelect').innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
 
@@ -321,7 +311,7 @@ function init() {
 function render() {
     const q = document.getElementById('search').value.toLowerCase();
     const catVal = document.getElementById('catSelect').value;
-    const st = document.getElementById('statusFilters').querySelector('.active')?.dataset?.st || 'all';
+    const st = quickFilter;
     const letter = document.getElementById('azNav').querySelector('.active')?.textContent || '';
     const catSide = document.getElementById('catList').querySelector('.active')?.dataset?.cat || '';
 
@@ -396,27 +386,12 @@ function goPage(p) { page = p; renderPage(); document.querySelector('.table-wrap
 function onSearch() { render(); }
 function onFilterChange() { perPage = parseInt(document.getElementById('perPage').value); render(); }
 
-function setStatusFilter(val, btn) {
-    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Clear sidebar & dropdown
-    document.getElementById('catList').querySelectorAll('.active').forEach(e => e.classList.remove('active'));
-    document.querySelectorAll('.sidebar-item[data-filter]').forEach(e => e.classList.remove('active'));
-    document.getElementById('catSelect').value = '';
-    quickFilter = 'all';
-    // Clear stat cards
-    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-    render();
-}
-
 function setQuickFilter(val, el) {
     document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
     el.classList.add('active');
     quickFilter = val;
     document.getElementById('catSelect').value = '';
     document.getElementById('catList').querySelectorAll('.active').forEach(e => e.classList.remove('active'));
-    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.status-btn.all').classList.add('active');
     document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
     if (val === 'none') document.querySelector('.stat-card[data-stat="none"]')?.classList.add('active');
     if (val === 'working') document.querySelector('.stat-card[data-stat="working"]')?.classList.add('active');
@@ -429,15 +404,9 @@ function setQuickFilter(val, el) {
 function setStatFilter(val, el) {
     document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
     document.getElementById('catSelect').value = '';
     quickFilter = val;
-    if (val === 'all') document.querySelector('.status-btn.all')?.classList.add('active');
-    else if (val === 'none') document.querySelector('.status-btn.none')?.classList.add('active');
-    else if (val === 'working') document.querySelector('.status-btn.working')?.classList.add('active');
-    else if (val === 'broken') document.querySelector('.status-btn.broken')?.classList.add('active');
-    // else hasContact stays without status filter
     render();
 }
 
@@ -445,8 +414,6 @@ function setCategoryFilter(cat, el) {
     document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('catSelect').value = cat;
-    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.status-btn.all').classList.add('active');
     document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
     quickFilter = 'all';
     render();
